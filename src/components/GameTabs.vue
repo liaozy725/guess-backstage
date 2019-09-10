@@ -1,6 +1,6 @@
 <template>
   <div class="game-tabs">
-    <el-tabs :addable="true" :closable="true" tab-position="top" v-model="selectedTabs" @tab-click="tabClick" @tab-remove="tabRemove" @tab-add="tabAdd">
+    <el-tabs :addable="addable" :closable="closable" tab-position="top" v-model="selectedTabs" @tab-click="tabClick" @tab-remove="tabRemove" @tab-add="tabAdd">
       <el-tab-pane v-for="item in tabList" :label="item" :name="item"></el-tab-pane>
     </el-tabs>
 
@@ -26,25 +26,35 @@
 
 <script>
 export default {
+  props: {
+    addable: {
+      type: Boolean,
+      default: true
+    },
+    closable: {
+      type: Boolean,
+      default: true
+    }
+  },
   data() {
     return {
       selectedTabs: '英雄联盟',
       tabList: ["英雄联盟", "Dota2", "守望先锋"],
-      visible:false,
-      btnLoading:false,
+      visible: false,
+      btnLoading: false,
       callRules: {
         name: [{ required: true, message: '请输入战队名称', trigger: 'change' }],
         teamNun: [{ required: true, message: '请输入战队数', trigger: 'change' }],
         peopleNum: [{ required: true, message: '请输入单场人数', trigger: 'change' }],
       },
-      formData:{
-        name:'',
-        teamNun:'',
-        peopleNum:''
+      formData: {
+        name: '',
+        teamNun: '',
+        peopleNum: ''
       }
     }
   },
-  created(){
+  created() {
 
   },
   methods: {
@@ -59,7 +69,7 @@ export default {
     tabAdd(e) {
       this.visible = true;
     },
-    confirmAddTabs(){
+    confirmAddTabs() {
 
     }
   }

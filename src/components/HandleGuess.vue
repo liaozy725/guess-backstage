@@ -1,35 +1,6 @@
 <template>
   <div class="add-guess">
-    <el-dialog :visible.sync="visible1" title="添加竞猜" center top="10vh" :before-close="beforeClose1">
-      <el-form :model="formData" :rules="callRules" ref="call" label-width="90px" class="demo-dynamic">
-        <el-form-item prop="memo" label="游戏">
-          <el-input placeholder="请输入标题" readonly v-model="formData.name"></el-input>
-        </el-form-item>
-        <el-form-item prop="memo" label="比赛标题">
-          <el-input placeholder="请输入比赛标题" v-model="formData.name"></el-input>
-        </el-form-item>
-        <el-form-item prop="memo" label="比赛时间">
-          <el-date-picker v-model="formData.date" type="datetime" placeholder="选择比赛日期时间"></el-date-picker>
-        </el-form-item>
-        <el-form-item prop="memo" label="局数">
-          <el-input placeholder="请输入局数" type="number" v-model="formData.name"></el-input>
-        </el-form-item>
-        <!-- 循环 -->
-        <el-form-item prop="memo" label="队伍">
-          <el-select v-model="formData.game" style="width:100%" placeholder="请选择游戏">
-            <el-option label="DOTA2" value="DOTA2"></el-option>
-            <el-option label="英雄联盟" value="英雄联盟"></el-option>
-          </el-select>
-        </el-form-item>
-      </el-form>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="visible1=false;">取 消</el-button>
-        <el-button type="primary" :loading="btnLoading" @click="nextStep()">下一步</el-button>
-      </span>
-    </el-dialog>
-
-    <!-- 第二步 -->
-    <el-dialog :visible.sync="visible2" title="添加竞猜" center top="10vh" width="1000px">
+    <el-dialog :visible.sync="visible" title="操作竞猜" center top="10vh" width="1000px" :before-close="beforeClose">
       <el-row :gutter="20">
         <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12" class="flex-item">
           <label class="tit">游戏:</label>
@@ -66,7 +37,7 @@
           <el-tab-pane label="第三局" name="4"></el-tab-pane>
         </el-tabs>
         <!-- 总竞猜 -->
-        <div class="guess-list">
+        <div class="guess-list" v-if="activeTab == 'first'">
           <!-- 循环 这个 -->
           <el-card class="list-box">
             <el-table :data="tableData">
@@ -74,19 +45,19 @@
               <el-table-column prop="headImage" label="类型" header-align="center" align="center"></el-table-column>
               <el-table-column prop="headImage" label="默认资金池" header-align="center" align="center">
                 <template slot-scope="scope">
-                  <el-input v-model="scope.row.money" type="number" placeholder="默认奖金池"></el-input>
+                  <el-input v-model="scope.row.money" disabled type="number" placeholder="默认奖金池"></el-input>
                 </template>
               </el-table-column>
               <el-table-column prop="headImage" label="抽成" header-align="center" align="center">
                 <template slot-scope="scope">
-                  <el-input v-model="scope.row.money" type="number" placeholder="抽成">
+                  <el-input v-model="scope.row.money" disabled type="number" placeholder="抽成">
                     <template slot="append">%</template>
                   </el-input>
                 </template>
               </el-table-column>
               <el-table-column prop="headImage" label="玩法" header-align="center" align="center">
                 <template slot-scope="scope">
-                  <el-select v-model="scope.row.money" placeholder="选择玩法">
+                  <el-select v-model="scope.row.money" disabled placeholder="选择玩法">
                     <el-option label="滚盘" value="滚盘"></el-option>
                     <el-option label="早盘" value="早盘"></el-option>
                   </el-select>
@@ -94,7 +65,7 @@
               </el-table-column>
               <el-table-column label="操作" header-align="center" width="80" align="center">
                 <template slot-scope="scope">
-                  <el-button type="text" size="small" @click="deleteItem()">删除</el-button>
+                  <el-button type="text" size="small" @click="settlement()">结算</el-button>
                 </template>
               </el-table-column>
             </el-table>
@@ -104,23 +75,22 @@
                 <div class="item-r">
                   <label>赔率：</label>
                   <el-input v-model="formData.game" type="number" clearable placeholder="赔率"></el-input>
+                  <span class="money">345USDT</span>
                 </div>
-              </el-col>
-              <el-col :xs="12" :sm="12" :md="12" :lg="12" :xl="12">
-                <span class="item-l">RNG</span>
-                <div class="item-r">
-                  <label>赔率：</label>
-                  <el-input v-model="formData.game" type="number" clearable placeholder="赔率"></el-input>
+                <div class="locks">
+                  <el-button size="mini" type="success" round>胜利</el-button>
+                  <!-- <i class="iconfont icon-suo"></i> -->
+                  <i class="iconfont icon-jiesuo"></i>
                 </div>
               </el-col>
             </el-row>
           </el-card>
         </div>
       </el-card>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="visible1=true;visible2=false;">上一步</el-button>
+      <!-- <span slot="footer" class="dialog-footer">
+        <el-button @click="visible=false">取消</el-button>
         <el-button type="primary" :loading="btnLoading" @click="submit()">完成</el-button>
-      </span>
+      </span> -->
     </el-dialog>
   </div>
 </template>
@@ -135,8 +105,6 @@ export default {
   },
   data() {
     return {
-      visible1: false,
-      visible2: false,
       btnLoading: false,
       callRules: {
         name: [{ required: true, message: '请输入战队名称', trigger: 'change' }],
@@ -152,26 +120,16 @@ export default {
     }
   },
   methods: {
-    // 弹框关闭前
-    beforeClose1(){
+    // 结算
+    settlement(){
       this.$emit("handleClose",false);
     },
-    nextStep() {
-      this.visible2 = true;
-      this.visible1 = false;
-    },
-    // 完成
-    submit() {
-      this.$emit("handleConfirm")
-    },
-    handleTabClick() {
+    handleTabClick(e) {
 
-    }
-  },
-  watch:{
-    visible(newVal,oldVal){
-      this.visible1 = newVal;
-      this.visible2 = false;
+    },
+    // 弹窗关闭前
+    beforeClose(){
+      this.$emit("handleClose",false);
     }
   }
 }
@@ -193,18 +151,41 @@ export default {
             padding-right: 0 !important;
             border-top: 1px solid #999;
             .item-l {
-              flex: 0 0 150px;
+              flex: 0 0 80px;
             }
             .item-r {
               flex: 1;
               .el-input {
-                width: 150px;
+                width: 100px;
+              }
+              .money {
+                width: 100px;
+                display: inline-block;
+                text-align: center;
               }
             }
-            &:nth-child(2n+1) .item-r{
+            .locks {
+              width: 100px;
+              padding-right: 10px;
+              line-height: 40px;
+              height: 40px;
+              text-align: right;
+              .iconfont {
+                font-size: 24px;
+                cursor: not-allowed;
+                vertical-align: middle;
+                margin-left: 4px;
+                &.icon-jiesuo {
+                  color: #409eff;
+                  cursor: pointer;
+                }
+              }
+            }
+            &:nth-child(2n + 1) .locks {
               border-right: 1px solid #ccc;
             }
-            &:nth-child(1),&:nth-child(2){
+            &:nth-child(1),
+            &:nth-child(2) {
               border-top: 0;
             }
           }

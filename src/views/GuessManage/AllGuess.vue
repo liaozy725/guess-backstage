@@ -1,7 +1,7 @@
 // 所有竞猜
 <template>
   <div class="recharge">
-    <game-tabs @tabChange="tabChange" @tabRemove="tabRemove"></game-tabs>
+    <game-tabs :closable="false" :addable="false" @tabChange="tabChange"></game-tabs>
     <div class="search clearfix">
       <el-row :gutter="10">
         <el-col :xs="24" :sm="24" :md="24" :lg="8" :xl="6">
@@ -13,7 +13,7 @@
       </el-row>
       <div class="oneTerm">
         <div class="serchBtn  pan-btn pink-btn" @click="selectList()">查询</div>
-        <div class="serchBtn  pan-btn green-btn" @click="visibleTeam=true;">添加竞猜</div>
+        <div class="serchBtn  pan-btn green-btn" @click="addGuessVisible=true;">添加竞猜</div>
       </div>
     </div>
 
@@ -35,8 +35,10 @@
       </el-table>
       <pagination :currentPage="currentPage" :total="total" :pageSize="pageSize" v-on:handleSizeChange="handleSizeChange" v-on:handleCurrentChange="handleCurrentChange"></pagination>
     </el-card>
-
-    <add-guess></add-guess>
+    <!-- 添加竞猜 -->
+    <add-guess :visible="addGuessVisible" @handleClose="addGuessVisible = false;" @handleConfirm="handleConfirmAdd"></add-guess>
+    <!-- 操作竞猜 -->
+    <handle-guess :visible="handleGuessVisible" @handleClose="handleGuessVisible = false;" @handleConfirm="handleConfirmHandle"></handle-guess>
   </div>
 </template>
 
@@ -44,10 +46,11 @@
 import Pagination from '@/components/Pagination.vue'
 import GameTabs from '@/components/GameTabs.vue'
 import AddGuess from '@/components/AddGuess.vue'
+import HandleGuess from '@/components/HandleGuess.vue'
 import { indexMethod } from '@/utils/vx'
 export default {
   components: {
-    Pagination,GameTabs,AddGuess
+    Pagination,GameTabs,AddGuess,HandleGuess
   },
   data() {
     return {
@@ -61,7 +64,8 @@ export default {
       mobile: '',
       nickName: '',
       realName: '',
-      visibleTeam:false,
+      addGuessVisible:false,
+      handleGuessVisible:true,
       btnLoading:false,
       callRules: {
         name: [{ required: true, message: '请输入战队名称', trigger: 'change' }],
@@ -104,13 +108,13 @@ export default {
     tabChange(e){
 
     },
-    // 标签删除
-    tabRemove(e){
+    // 添加竞猜完成回调
+    handleConfirmAdd(){
 
     },
-    // 确定 添加 /编辑 战队
-    confirmTeam(){
-
+    // 操作竞猜完成回调
+    handleConfirmHandle(){
+      
     }
   }
 }
