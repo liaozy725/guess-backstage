@@ -1,0 +1,100 @@
+$blue:#324157;
+$light-blue:#409EFF;
+$red:#C03639;
+$pink: #E65D6E;
+$green: #30B08F;
+$tiffany: #4AB7BD;
+$yellow:rgb(252, 179, 84);
+$panGreen: #30B08F;
+$panDefaultYellow: #30B08F;
+$panDefaultBlue: #409EFF;
+
+@mixin colorBtn($color) {
+  background: $color;
+  &:hover {
+    color: $color;
+    &:before,
+    &:after {
+      background: $color;
+    }
+  }
+}
+
+.blue-btn {
+  @include colorBtn($blue)
+}
+
+.light-blue-btn {
+  @include colorBtn($light-blue)
+}
+
+.red-btn {
+  @include colorBtn($red)
+}
+
+.pink-btn {
+  @include colorBtn($pink)
+}
+
+.green-btn {
+  @include colorBtn($green)
+}
+
+.tiffany-btn {
+  @include colorBtn($tiffany)
+}
+
+.yellow-btn {
+  @include colorBtn($yellow)
+}
+.default-yellow-btn {
+  @include colorBtn($panDefaultYellow)
+}
+.default-blue-btn {
+  @include colorBtn($panDefaultBlue)
+}
+
+.pan-btn {
+  font-size: 14px;
+  color: #fff;
+  padding: 10px 30px;
+  border-radius: 4px;
+  border: none;
+  outline: none;
+  // margin-right: 10px;
+  -webkit-transition: 600ms ease all;
+  transition: 600ms ease all;
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  &:hover {
+    background: #fff;
+    &:before,
+    &:after {
+      width: 100%;
+      -webkit-transition: 600ms ease all;
+      transition: 600ms ease all;
+    }
+  }
+  &:before,
+  &:after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 2px;
+    width: 0;
+    -webkit-transition: 400ms ease all;
+    transition: 400ms ease all;
+  }
+  &::after {
+    right: inherit;
+    top: inherit;
+    left: 0;
+    bottom: 0;
+  }
+  &.serchBtn{
+    margin-left: 15px;
+  }
+}
+

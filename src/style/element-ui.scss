@@ -1,0 +1,40 @@
+.el-dialog__body {
+  overflow: hidden;
+}
+
+.el-table__row:hover {
+  cursor: pointer;
+}
+
+.el-message {
+  top: 9% !important;
+}
+.el-card__body{
+  padding: 10px;
+}
+
+
+.el-dialog__close,
+.el-dialog__title {
+  font-size: 24px !important;
+}
+
+@media screen and (max-width: 768px) {
+  .el-dialog {
+    width: 88% !important;
+  }
+  .el-dialog__body {
+    padding: 10px !important;
+  }
+}
+
+#app .sidebar-container .iconfont {
+  margin-right: 10px;
+  width: 1em;
+  height: 1em;
+  vertical-align: -.15em;
+  fill: currentColor;
+  overflow: hidden;
+  color: #fff;
+  font-size: 20px;
+}
