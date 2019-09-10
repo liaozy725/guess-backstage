@@ -43,26 +43,10 @@
             <el-table :data="tableData">
               <el-table-column prop="headImage" label="标题" header-align="center" align="center"></el-table-column>
               <el-table-column prop="headImage" label="类型" header-align="center" align="center"></el-table-column>
-              <el-table-column prop="headImage" label="默认资金池" header-align="center" align="center">
-                <template slot-scope="scope">
-                  <el-input v-model="scope.row.money" disabled type="number" placeholder="默认奖金池"></el-input>
-                </template>
-              </el-table-column>
-              <el-table-column prop="headImage" label="抽成" header-align="center" align="center">
-                <template slot-scope="scope">
-                  <el-input v-model="scope.row.money" disabled type="number" placeholder="抽成">
-                    <template slot="append">%</template>
-                  </el-input>
-                </template>
-              </el-table-column>
-              <el-table-column prop="headImage" label="玩法" header-align="center" align="center">
-                <template slot-scope="scope">
-                  <el-select v-model="scope.row.money" disabled placeholder="选择玩法">
-                    <el-option label="滚盘" value="滚盘"></el-option>
-                    <el-option label="早盘" value="早盘"></el-option>
-                  </el-select>
-                </template>
-              </el-table-column>
+              <el-table-column prop="headImage" label="初始资金" header-align="center" align="center"></el-table-column>
+              <el-table-column prop="headImage" label="目前资金" header-align="center" align="center"></el-table-column>
+              <el-table-column prop="headImage" label="抽成" header-align="center" align="center"></el-table-column>
+              <el-table-column prop="headImage" label="收益" header-align="center" align="center"></el-table-column>
               <el-table-column label="操作" header-align="center" width="80" align="center">
                 <template slot-scope="scope">
                   <el-button type="text" size="small" @click="settlement()">结算</el-button>
@@ -116,7 +100,7 @@ export default {
         teamNun: ''
       },
       activeTab: 'first',
-      tableData: [1],
+      tableData: [],
     }
   },
   methods: {
