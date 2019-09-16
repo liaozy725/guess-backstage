@@ -11,6 +11,12 @@ Vue.use(Router);
 var router = new Router({
   routes: [
     {
+      path: '/login',
+      component: _import('Other/login'),
+      noDropdown: true,
+      hidden: true
+    },
+    {
       path: '',
       component: Layout,
       redirect: '/GameManagement',
