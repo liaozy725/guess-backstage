@@ -16,7 +16,6 @@ if (process.env.NODE_ENV == 'production') {
   // 生产环境
   axios.defaults.baseURL = 'http://121.42.196.103:8282/jingcai/api/';
 } else {
-  // 开发环境
   axios.defaults.baseURL = '/apis/';
 }
 
@@ -37,11 +36,11 @@ axios.interceptors.request.use(config => {
 /* 响应处理 */
 axios.interceptors.response.use(response=>{
   try {
-    if(response.code=='0'){
+    if(response.data.retCode=='0'){
       return response;
     }else{
       Message({
-        showClose: true, message: response.data || '请求异常', type: 'error', duration: 4 * 1000
+        showClose: true, message: response.data.errorMsg || '请求异常', type: 'error', duration: 4 * 1000
       })
       return response.data;
     }
