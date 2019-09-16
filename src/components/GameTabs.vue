@@ -1,18 +1,18 @@
 <template>
   <div class="game-tabs">
     <el-tabs :addable="addable" :closable="closable" tab-position="top" v-model="selectedTabs" @tab-click="tabClick" @tab-remove="tabRemove" @tab-add="tabAdd">
-      <el-tab-pane v-for="item in tabList" :label="item" :name="item"></el-tab-pane>
+      <el-tab-pane v-for="item in tabList" :label="item.gameName" :name="item.id"></el-tab-pane>
     </el-tabs>
 
     <el-dialog :visible.sync="visible" title="添加游戏" center top="10vh">
       <el-form :model="formData" :rules="callRules" ref="call" label-width="90px" class="demo-dynamic">
-        <el-form-item prop="memo" label="游戏名称">
-          <el-input placeholder="请输入游戏名称" v-model="formData.name"></el-input>
+        <el-form-item prop="gameName" label="游戏名称">
+          <el-input placeholder="请输入游戏名称" v-model="formData.gameName"></el-input>
         </el-form-item>
-        <el-form-item prop="memo" label="战队数">
-          <el-input placeholder="请输入战队数" type="number" v-model="formData.teamNun"></el-input>
+        <el-form-item prop="number" label="战队数">
+          <el-input placeholder="请输入战队数" type="number" v-model="formData.number"></el-input>
         </el-form-item>
-        <el-form-item prop="memo" label="单场人数">
+        <el-form-item prop="peopleNum" label="单场人数">
           <el-input placeholder="请输入游戏名称" type="number" v-model="formData.peopleNum"></el-input>
         </el-form-item>
       </el-form>
@@ -38,49 +38,66 @@ export default {
   },
   data() {
     return {
-      selectedTabs: '英雄联盟',
-      tabList: ["英雄联盟", "Dota2", "守望先锋"],
+      selectedTabs: "英雄联盟",
+      tabList: [],
       visible: false,
       btnLoading: false,
       callRules: {
-        name: [{ required: true, message: '请输入战队名称', trigger: 'change' }],
-        teamNun: [{ required: true, message: '请输入战队数', trigger: 'change' }],
-        peopleNum: [{ required: true, message: '请输入单场人数', trigger: 'change' }],
+        gameName: [
+          { required: true, message: "请输入战队名称", trigger: "change" }
+        ],
+        number: [
+          { required: true, message: "请输入战队数", trigger: "change" }
+        ],
+        peopleNum: [
+          { required: true, message: "请输入单场人数", trigger: "change" }
+        ]
       },
       formData: {
-        name: '',
-        teamNun: '',
-        peopleNum: ''
+        gameName: "",
+        number: "",
+        peopleNum: ""
       }
-    }
+    };
   },
   created() {
-
+    this.getGameList();
   },
   methods: {
     tabClick(e) {
       console.log(e);
-      this.$emit("tabChange")
+      this.$emit("tabChange");
     },
     tabRemove(name) {
-      this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(()=>{
-        this.$emit("tabRemove",name);
-      }).catch(()=>{
+      this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
       })
-      
+        .then(() => {
+          this.$emit("tabRemove", name);
+        })
+        .catch(() => {});
     },
     tabAdd(e) {
       this.visible = true;
     },
-    confirmAddTabs() {
-
+    confirmAddTabs() {},
+    // 获取游戏列表
+    getGameList() {
+      let params = {
+        token: this.$store.getters.token,
+        pageNum: 0,
+        pageSize: 1000
+      };
+      this.$http.post("game/list", params).then(res => {
+        if (res.retCode == 0) {
+          this.tabList = res.data;
+        }
+      });
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>
