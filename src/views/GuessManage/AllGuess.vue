@@ -33,7 +33,7 @@
           </template>
         </el-table-column>
       </el-table>
-      <pagination :currentPage="currentPage" :total="total" :pageSize="pageSize" v-on:handleSizeChange="handleSizeChange" v-on:handleCurrentChange="handleCurrentChange"></pagination>
+      <pagination :pageNum="pageNum" :total="total" :pageSize="pageSize" v-on:handleSizeChange="handleSizeChange" v-on:handleCurrentChange="handleCurrentChange"></pagination>
     </el-card>
     <!-- 添加竞猜 -->
     <add-guess :visible="addGuessVisible" @handleClose="addGuessVisible = false;" @handleConfirm="handleConfirmAdd"></add-guess>
@@ -58,7 +58,7 @@ export default {
       tableLoding: false,
       total: 0, // 总页数
       pages: 1, // 第一次请求页
-      currentPage: 1, // 当前页数
+      pageNum: 1, // 当前页数
       pageSize: 10, // 每页显示个数
       applyTime: '',
       mobile: '',
@@ -87,17 +87,17 @@ export default {
     handleSizeChange(pageSize) {
       this.tableData = [];
       this.pageSize = pageSize
-      this.currentPage = 1;
+      this.pageNum = 1;
       this.getList()
     },
-    // 分页处理 - 改变 currentPage
-    handleCurrentChange(currentPage) {
-      this.currentPage = currentPage;
+    // 分页处理 - 改变 pageNum
+    handleCurrentChange(pageNum) {
+      this.pageNum = pageNum;
       this.getList()
     },
     // 查询
     selectList(){
-      this.currentPage = 1;
+      this.pageNum = 1;
       this.getList()
     },
     // 获取列表

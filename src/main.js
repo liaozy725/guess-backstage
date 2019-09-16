@@ -14,7 +14,7 @@ Vue.config.productionTip = false;
 
 if (process.env.NODE_ENV == 'production') {
   // 生产环境
-  axios.defaults.baseURL = 'http://121.42.196.103:8282/jingcai/api/';
+  axios.defaults.baseURL = 'http://121.42.196.103:8282/jingcai/admin/';
 } else {
   axios.defaults.baseURL = '/apis/';
 }
@@ -37,7 +37,10 @@ axios.interceptors.request.use(config => {
 axios.interceptors.response.use(response=>{
   try {
     if(response.data.retCode=='0'){
-      return response;
+      return response.data;
+    }else if(response.data.retCode=='10002'){
+      store.commit("setToken",'');
+      router.replace('/login');
     }else{
       Message({
         showClose: true, message: response.data.errorMsg || '请求异常', type: 'error', duration: 4 * 1000
@@ -58,7 +61,22 @@ axios.interceptors.response.use(response=>{
 
 Vue.prototype.$http = axios;
 
+// 从本地获取token  userInfo 缓存
+try {
+  let token = localStorage.getItem('token');
+  if(token) store.commit("setToken",token);
+  let userInfo = localStorage.getItem('setUserInfo');
+  if(userInfo) store.commit("userInfo",userInfo);
+} catch (error) {
+  
+}
 
+// 过滤器
+import * as myFilter from '@/utils/vx.js'
+
+Object.keys(myFilter).forEach(key => {
+    Vue.filter(key, myFilter[key])
+})
 
 new Vue({
   router,

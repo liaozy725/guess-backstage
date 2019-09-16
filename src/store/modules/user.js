@@ -1,17 +1,18 @@
-// import { loginByUsername, logout } from '@/api/login'
 import $vx from '@/utils/vx'
 const user = {
   state: {
     token: $vx.localStorage.getItem('token'),
-    userInfo:$vx.localStorage.getItem('user_info'),
+    userInfo:$vx.localStorage.getItem('userInfo'),
   },
 
   mutations: {
-    SET_TOKEN: (state, token) => {
-      state.token = token
+    setToken: (state, token) => {
+      state.token = token;
+      localStorage.setItem('token',token)
     },
-    SET_USER_INFO: (state, userInfo) => {
-      state.userInfo = userInfo
+    setUserInfo: (state, userInfo) => {
+      state.userInfo = userInfo;
+      $vx.localStorage.setItem('userInfo',userInfo)
     }
   },
 
@@ -40,21 +41,7 @@ const user = {
     },
     // // 登出
     LogOut({ commit, state }) {
-      // let userInfo = state.userInfo;
-      // return new Promise((resolve, reject) => {
-      //   logout({ clientId: userInfo.clientId, userName: userInfo.userName }).then((res) => {
-      //     // console.log(res)
-      //     if (res.code === 0) {
-      //       $vx.localStorage.removeItem('token')
-      //       $vx.localStorage.removeItem('user_info');
-      //       commit('SET_TOKEN', '')
-      //       commit('SET_USER_INFO', {})
-      //       resolve()
-      //     }
-      //   }).catch(error => {
-      //     reject(error)
-      //   })
-      // })
+      
     }
   }
 }

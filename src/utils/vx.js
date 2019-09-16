@@ -8,7 +8,7 @@ export const sexObj = { 0: '未知', 1: '男', 2: '女' }
 export const sexArr = [{ label: '未知', value: 0 }, { label: '男', value: 1 }, { label: '女', value: 2 }]
 
 export function indexMethod(index) {
-  return (index + 1) + (this.pageSize * (this.currentPage - 1));
+  return (index + 1) + (this.pageSize * (this.pageNum));
 }
 
 // 是否有属性

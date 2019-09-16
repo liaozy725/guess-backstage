@@ -3,7 +3,9 @@
     <div class="login-content clearfix">
       <div class="login-left fl">
         <div class="logo-left-text">
-          <div class="logo-left-img"><img src="../../assets/logo.png" alt=""></div>
+          <div class="logo-left-img">
+            <img src="../../assets/logo.png" alt />
+          </div>
           <div class="logoTitle">竞猜后台</div>
         </div>
       </div>
@@ -13,11 +15,11 @@
           <el-form ref="formInline" :model="formInline" :rules="ruleInline" autocomplete="off">
             <el-form-item prop="user">
               <div class="form-title">用户名</div>
-              <el-input type="text" v-model="formInline.accountLogin" placeholder="" style="width: 300px" clearable></el-input>
+              <el-input type="text" v-model="formInline.accountLogin" placeholder style="width: 300px" clearable></el-input>
             </el-form-item>
             <el-form-item prop="password">
               <div class="form-title">密码</div>
-              <el-input v-model="formInline.accountPassword" placeholder="" style="width: 300px" type="password" clearable></el-input>
+              <el-input v-model="formInline.accountPassword" placeholder style="width: 300px" type="password" clearable></el-input>
             </el-form-item>
             <el-form-item>
               <el-button type="primary" @click="handleSubmit()" round style="width: 180px;" class="loginBtn">登录</el-button>
@@ -33,44 +35,49 @@
 export default {
   data() {
     return {
-      loginAccount: '', //账户名字
-      pass: '', //密码
+      loginAccount: "", //账户名字
+      pass: "", //密码
       formInline: {
-        accountLogin: '',
-        accountPassword: ''
+        accountLogin: "",
+        accountPassword: ""
       },
       ruleInline: {
-        accountLogin: [{
-          required: true,
-          message: '请填写用户名',
-          trigger: 'blur'
-        }],
-        accountPassword: [{
-          required: false,
-          message: '请填写密码',
-          trigger: 'blur'
-        }]
+        accountLogin: [
+          {
+            required: true,
+            message: "请填写用户名",
+            trigger: "blur"
+          }
+        ],
+        accountPassword: [
+          {
+            required: false,
+            message: "请填写密码",
+            trigger: "blur"
+          }
+        ]
       }
-    }
+    };
   },
   methods: {
     handleSubmit() {
-      this.$refs['formInline'].validate(valid => {
+      this.$refs["formInline"].validate(valid => {
         if (valid) {
-          this.$http.post('account/login', this.formInline).then(res => {
-						if(res.retCode==0){
-							this.$router.replace('/');
-						}
-          })
+          this.$http.post("account/login", this.formInline).then(res => {
+            if (res.retCode == 0) {
+              this.$store.commit("setToken", res.data.token);
+              this.$store.commit("setUserInfo", res.data);
+              this.$router.replace("/");
+            }
+          });
         } else {
-          console.log('error submit!!');
+          console.log("error submit!!");
           return false;
         }
-      })
-
-    },
+      });
+    }
   }
-}
+};
 </script>
 <style lang="scss">
 .login {
@@ -108,7 +115,7 @@ export default {
         .logo-left-img img {
           display: block;
           margin: 0 auto;
-          width: 100px;
+          width: 200px;
         }
 
         .logoTitle {
@@ -127,11 +134,11 @@ export default {
       background: #fff;
 
       .login-title {
-        font-size: 14px;
+        font-size: 24px;
         color: #5aa6ff;
         letter-spacing: 0;
         text-align: center;
-        margin: 70px 0;
+        margin: 50px 0;
       }
 
       .form {

@@ -49,6 +49,16 @@ var router = new Router({
       ]
     }, 
     {
+      path: '/UserManage',
+      component: Layout,
+      redirect: '/UserManage/UserList',
+      icon: 'icon-user',
+      name: '用户管理',
+      children: [
+        {path: 'UserList',component: _import('UserManage/UserList'),meta: {keepAlive: true},name: '用户列表'}
+      ]
+    },
+    {
       path: '/FinanceManage',
       component: Layout,
       redirect: '/FinanceManage/Survey',
