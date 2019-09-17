@@ -94,6 +94,7 @@ export default {
         gameId: '',
         teamPic: 'https://gss0.bdstatic.com/94o3dSag_xI4khGkpoWK1HF6hhy/baike/w%3D268%3Bg%3D0/sign=7105df784dc2d562f208d7ebdf2af7d2/f9198618367adab482d06a5b89d4b31c8701e4a2.jpg'
       },
+      selectGameId:'', // 选中的游戏id
     }
   },
   created() {
@@ -140,7 +141,8 @@ export default {
     },
     // 标签改变 根据游戏来获取列表
     tabChange(gameId) {
-      this.getList(gameId);
+      this.selectGameId = gameId;
+      this.getList();
     },
     // 标签删除
     tabRemove(e) {
