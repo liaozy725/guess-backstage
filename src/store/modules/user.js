@@ -3,6 +3,7 @@ const user = {
   state: {
     token: $vx.localStorage.getItem('token'),
     userInfo:$vx.localStorage.getItem('userInfo'),
+    gameList:[]
   },
 
   mutations: {
@@ -13,6 +14,10 @@ const user = {
     setUserInfo: (state, userInfo) => {
       state.userInfo = userInfo;
       $vx.localStorage.setItem('userInfo',userInfo)
+    },
+    // 设置游戏列表
+    setGameList: (state, list) =>{
+      state.gameList = list || [];
     }
   },
 
@@ -42,7 +47,8 @@ const user = {
     // // 登出
     LogOut({ commit, state }) {
       
-    }
+    },
+    
   }
 }
 

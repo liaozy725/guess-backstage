@@ -1,175 +1,161 @@
 <template>
-  <div>
-    <el-upload list-type="picture-card" :http-request="httpRequest" ref="upload" :accept="accept" :headers="headers" :show-file-list="false" :action="upImgUrl" :multiple="multiple" :data="fileData" :before-upload="beforeAvatarUpload" :on-error="unloadError" :on-success="unloadSucceed" :on-change="uploadChange" >
-      <i class="el-icon-plus"></i>
+  <div class="upload-container">
+    <el-upload action='' :http-request="httpRequest" :disabled="disabled" :limit="limit" :drag="drag" :show-file-list="showFileList" :multiple="multiple" :accept="accept" :file-list="fileList" :on-exceed='onExceed'>
+      <!-- <slot></slot> -->
+      <i class="iconfont icon-tianjia-"></i>
     </el-upload>
+    <div class="uploading" v-if="showLoading && uploading">
+
+    </div>
   </div>
 </template>
 
 <script>
-import $vx from 'utils/vx'
-import axios from 'axios'
+import OSS from 'ali-oss'
 export default {
-  props:{
-    multiple:{
-      type:Boolean,
-      default:false
-    },
-    isBreak:{
-      type:Boolean,
-      default:true
-    },
+  props: {
+    // 接受上传的文件类型 audio/*   video/*  image/*
     accept: {
       type: String,
-      default: 'image/*'
+      default: ''
     },
-    uploadType: {
+    // 最大允许上传个数
+    limit: {
       type: Number,
       default: null
     },
-
+    // 是否显示上传文件列表
+    showFileList: {
+      type: Boolean,
+      default: false
+    },
+    // 是否禁用
+    disabled: {
+      type: Boolean,
+      default: false
+    },
+    // 是否支持多选文件
+    multiple: {
+      type: Boolean,
+      default: false
+    },
+    // 是否拖拽上传
+    drag: {
+      type: Boolean,
+      default: false
+    },
+    // 是否显示文件上传遮罩层
+    showLoading: {
+      type: Boolean,
+      default: false
+    }
   },
   data() {
     return {
-      headers: {}, //图片上传头部
-      upImgUrl:'', //图片上传地址
-      fileData: {}, //图片上传参数
-      acceptObj:{1:'image/*',2:'video/*',3:'*/*'}, // 文件上传类型
-      maxSize:1024*1024*1,
-      percentage:0
+      commonParams: {
+        uploadType: 'image',
+        uploadDir: 'merchant',
+        uploadImage: 'merchant'
+      },
+      uploading: false,
+      fileList: [],
+      returnArr: [],
+      ossSign: {}
     }
   },
   created() {
-    this.upImgUrl = window.g.ApiUrl+'upload/FileUpload';
-    this.headers['Authorization'] = $vx.localStorage.getItem('token'); //上传图片头部
+    this.initOss();
   },
   methods: {
-    // 自定义上传
-    httpRequest(file){
-      var formData = new FormData();
-      file.headers["Content-Type"]='multipart/form-data';
-      this.percentage=0;
-      var _this = this;
-
-      console.log(file.file)
-
-      if(this.checkImg(file.file.type) && file.file.size > this.maxSize){
-        console.log("压缩图片文件")
-        this.compress(file.file, function(blob) {
-          // Blob 格式文件转为 file 格式
-          var newFile=new window.File([blob],file.file.name,{type: file.file.type});
-          console.log(newFile)
-          formData.append("file",newFile);
-          
-          axios.post(file.action,formData,{headers:file.headers,timeout:30*60*1000,onUploadProgress(ev){
-            _this.percentage = parseInt((ev.loaded/ev.total)*100);
-          }}).then(data=>{
-            file.onSuccess(data);
-          })
-        })
-      }else{
-        formData.append("file",file.file);
-        axios.post(file.action,formData,{headers:file.headers,timeout:30*60*1000,onUploadProgress(ev){
-          _this.percentage = parseInt((ev.loaded/ev.total)*100);
-        }}).then(data=>{
-          file.onSuccess(data);
-        })
-      }
+    initOss() {
+      this.$http.post('common/alioss/get_sign').then(res => {
+        if(res.retCode==0){
+          this.ossSign = res.data;
+        }
+      });
     },
-
-    checkImg(_name){
-      var name = _name;
-      var index= name.indexOf("/"); //（考虑严谨用lastIndexOf(".")得到）得到"."在第几位
-      name = name.substring(index); //截断"."之前的，得到后缀
-      // console.log(name)
-      if(name=="/bmp"||name=="/png"||name=="/gif"||name=="/jpg"||name=="/jpeg"){  //根据后缀，判断是否符合图片格式
-         return true
-      }
+    // 随机生成字符串
+    randomString(e) {
+      e = e || 6;
+      var t = "ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678",
+        a = t.length,
+        n = "";
+      for (let i = 0; i < e; i++) n += t.charAt(Math.floor(Math.random() * a));
+      return n
     },
-    // 图片压缩
-    compress(fileObj, callback) {
-      let quality = 0.6 // 默认图片质量为0.7
-      const _this = this;
-      try {
-        const image = new Image()
-        image.src = URL.createObjectURL(fileObj);
-        image.onload = function() {
-          const that = this
-          // 默认按比例压缩
-          let w = that.width
-          let h = that.height
-          const scale = w / h
-          w = fileObj.width || w
-          h = fileObj.height || (w / scale)
-          
-          // 生成canvas
-          const canvas = document.createElement('canvas')
-          const ctx = canvas.getContext('2d')
-          // 创建属性节点
-          const anw = document.createAttribute('width')
-          anw.nodeValue = w
-          const anh = document.createAttribute('height')
-          anh.nodeValue = h
-          canvas.setAttributeNode(anw)
-          canvas.setAttributeNode(anh)
-          ctx.drawImage(that, 0, 0, w, h)
-          // 图像质量
-          
-          if (fileObj.quality && fileObj.quality <= 1 && fileObj.quality > 0) {
-            quality = fileObj.quality
-          }
-          // quality值越小，所绘制出的图像越模糊
-          const data = canvas.toDataURL('image/jpeg', quality)
-          
-          // 压缩完成执行回调
-          const newFile = _this.convertBase64UrlToBlob(data)
-          callback(newFile)
-        }
-      } catch (e) {
-        console.log('压缩失败!')
-      }
+    // 上传文件 获取凭证
+    httpRequest(file) {
+      this.uploadFile(file, this.ossSign)
     },
-    // 压缩图片转为blob 格式
-    convertBase64UrlToBlob(urlData) {
-      const bytes = window.atob(urlData.split(',')[1]) // 去掉url的头，并转换为byte
-      // 处理异常,将ascii码小于0的转换为大于0
-      const ab = new ArrayBuffer(bytes.length)
-      const ia = new Uint8Array(ab)
-      for (let i = 0; i < bytes.length; i++) {
-        ia[i] = bytes.charCodeAt(i)
-      }
-      return new Blob([ab], { type: 'image/png' })
+    // 上传文件
+    uploadFile(file, res) {
+      var client = new OSS({
+        accessKeyId: res.accessid,
+        accessKeySecret: 'asditDlr12axrE45ydA5xb9qTpeQh3',
+        success_action_status: '200',
+        callback: res.callback,
+        signature: res.signature,
+        bucket: 'ipfsoss'
+      });
+      var fileName = Date.parse(new Date());
+      var randStr = this.randomString(6);
+      var arr = file.file.name.split('.');
+      client.put(res.dir + fileName + randStr + '.' + arr[arr.length - 1], file.file).then(res => {
+        console.log("图片上传完成",res);
+        
+        this.uploading = false;
+        this.uploadEnd(res)
+      })
     },
-    // 上传前
-    beforeAvatarUpload(file) {
-      this.$emit('beforeUpload',file,this.uploadType)
-      if(!this.isBreak) this.$message.error("只允许上传一张图片！！")
-      return this.isBreak
+    // 上传完成回调
+    uploadEnd(res) {
+      this.$emit('uploadSuccess', res);
     },
-    // 上传
-    uploadChange(file, fileList) {
-      if (file.status == 'ready') {
-      } else if (file.status == 'fail') {
-        this.$message.error("图片上传出错，请重试！")
-      }
-    },
-    // 上传失败
-    unloadError(err) {
-      console.log(err)
-      this.$message.error("图片上传出错，请重试！")
-    },
-    // 上传成功
-    unloadSucceed(res,file) {
-      if(res.code===0){
-        this.$emit('upload',res.data,file,this.percentage)
-      }else{
-        this.$message.error(res.message)
-      }
-    },
-  },
+    // 文件超出个数限制时的钩子
+    onExceed(fileList) {
+      this.$message({
+        message: "最多只能上传" + this.limit + "张图片",
+        type: 'warning',
+        duration: 1200
+      });
+    }
+  }
 }
+
 </script>
 
 <style scoped>
+.uploading {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 999;
+}
+>>> .el-upload {
+  border: 1px dashed #d9d9d9;
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  width: 120px;
+  height: 120px;
+}
+>>> .el-upload:hover {
+  border-color: #409eff;
+}
+>>> .el-upload .iconfont{
+  font-size: 38px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  color: #d9d9d9;
+  transform: translate(-50%,-50%);
+}
 
+>>> .el-upload:hover .iconfont{
+  color: #409eff;
+}
 </style>

@@ -20,16 +20,21 @@
     <el-card class="box-card">
       <el-table :data="tableData" style="width: 100%" stripe fit highlight-current-row v-loading="tableLoding">
         <el-table-column type="index" :index="indexMethod" width="90" label="序号" header-align="center" align="center"></el-table-column>
-        <el-table-column prop="headImage" label="LOGO" header-align="center" align="center">
+        <el-table-column prop="teamPic" label="战队LOGO" header-align="center" align="center">
           <template slot-scope="scope">
-            <img width="60" height="60" v-lazy="scope.row.headImage" :key="scope.row.id">
+            <img width="60" height="60" :src="scope.row.teamPic">
           </template>
         </el-table-column>
-        <el-table-column prop="nickName" label="战队名称" header-align="center" align="center"></el-table-column>
-        <el-table-column prop="mobile" label="创建时间" header-align="center" align="center"></el-table-column>
+        <el-table-column prop="teamName" label="战队名称" header-align="center" align="center"></el-table-column>
+        <el-table-column prop="teamContent" label="战队介绍" header-align="center" align="center"></el-table-column>
+        <el-table-column prop="createTime" label="创建时间" header-align="center" align="center">
+          <template slot-scope="scope">
+            <span>{{scope.row.createTime | parseTime}}</span>
+          </template>
+        </el-table-column>
         <el-table-column label="操作" header-align="center" width="160" align="center">
           <template slot-scope="scope">
-            <el-button type="text" size="small">编辑</el-button>
+            <el-button type="text" size="small" @click="editTeam(scope.row)">编辑</el-button>
             <el-button type="text" size="small">删除</el-button>
           </template>
         </el-table-column>
@@ -37,13 +42,18 @@
       <pagination :pageNum="pageNum" :total="total" :pageSize="pageSize" v-on:handleSizeChange="handleSizeChange" v-on:handleCurrentChange="handleCurrentChange"></pagination>
     </el-card>
 
-    <el-dialog :visible.sync="visibleTeam" title="添加战队" center top="10vh">
-      <el-form :model="formData" :rules="callRules" ref="call" label-width="90px" class="demo-dynamic">
-        <el-form-item prop="memo" label="战队名称">
-          <el-input placeholder="请输入战队名称" v-model="formData.name"></el-input>
+    <el-dialog :visible.sync="visibleTeam" title="添加战队" center top="10vh" :close-on-click-modal="false">
+      <el-form :model="formData" :rules="callRules" ref="formRef" label-width="90px" class="demo-dynamic">
+        <el-form-item prop="teamName" label="战队名称">
+          <el-input placeholder="请输入战队名称" v-model="formData.teamName"></el-input>
         </el-form-item>
-        <el-form-item prop="memo" label="战队介绍">
-          <el-input placeholder="请输入战队介绍" type="textarea" :autosize="{ minRows: 3}" v-model="formData.teamNun"></el-input>
+        <el-form-item prop="teamContent" label="战队介绍">
+          <el-input placeholder="请输入战队介绍" type="textarea" :autosize="{ minRows: 3}" v-model="formData.teamContent"></el-input>
+        </el-form-item>
+        <el-form-item prop="gameId" label="所属游戏">
+          <el-select v-model="formData.gameId" placeholder="请选择游戏" clearable style="width:100%;">
+            <el-option v-for="item in gameList" :label="item.gameName" :value="item.id"></el-option>
+          </el-select>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -60,7 +70,7 @@ import GameTabs from '@/components/GameTabs.vue'
 import { indexMethod } from '@/utils/vx'
 export default {
   components: {
-    Pagination,GameTabs
+    Pagination, GameTabs
   },
   data() {
     return {
@@ -68,26 +78,31 @@ export default {
       tableLoding: false,
       total: 0, // 总页数
       pages: 1, // 第一次请求页
-      pageNum: 1, // 当前页数
+      pageNum: 0, // 当前页数
       pageSize: 10, // 每页显示个数
-      applyTime: '',
       mobile: '',
-      nickName: '',
-      realName: '',
-      visibleTeam:false,
-      btnLoading:false,
+      visibleTeam: false,
+      btnLoading: false,
       callRules: {
-        name: [{ required: true, message: '请输入战队名称', trigger: 'change' }],
-        teamNun: [{ required: true, message: '请输入战队数', trigger: 'change' }]
+        teamName: [{ required: true, message: '请输入战队名称', trigger: 'blur' }],
+        teamContent: [{ required: true, message: '请输入战队数', trigger: 'blur' }],
+        gameId: [{ required: true, message: '请选择游戏', trigger: 'change' }],
       },
-      formData:{
-        name:'',
-        teamNun:''
-      }
+      formData: {
+        teamName: '',
+        teamContent: '',
+        gameId: '',
+        teamPic: 'https://gss0.bdstatic.com/94o3dSag_xI4khGkpoWK1HF6hhy/baike/w%3D268%3Bg%3D0/sign=7105df784dc2d562f208d7ebdf2af7d2/f9198618367adab482d06a5b89d4b31c8701e4a2.jpg'
+      },
     }
   },
   created() {
-
+    
+  },
+  computed: {
+    gameList() {
+      return this.$store.state.user.gameList;
+    }
   },
   methods: {
     indexMethod: indexMethod,
@@ -95,7 +110,7 @@ export default {
     handleSizeChange(pageSize) {
       this.tableData = [];
       this.pageSize = pageSize
-      this.pageNum = 1;
+      this.pageNum = 0;
       this.getList()
     },
     // 分页处理 - 改变 pageNum
@@ -104,30 +119,62 @@ export default {
       this.getList()
     },
     // 查询
-    selectList(){
-      this.pageNum = 1;
+    selectList() {
+      this.pageNum = 0;
       this.getList()
     },
     // 获取列表
-    getList(){
-
+    getList(gameId) {
+      let params = {
+        token: this.$store.state.user.token,
+        pageNum: this.pageNum,
+        pageSize: this.pageSize
+      }
+      this.tableLoding = true;
+      this.$http.post('gameTeam/list', params).then(res => {
+        this.tableLoding = false;
+        if (res.retCode == 0) {
+          this.tableData = res.data;
+        }
+      })
     },
-    // 标签改变
-    tabChange(e){
-
+    // 标签改变 根据游戏来获取列表
+    tabChange(gameId) {
+      this.getList(gameId);
     },
     // 标签删除
-    tabRemove(e){
+    tabRemove(e) {
 
     },
     // 确定 添加 /编辑 战队
-    confirmTeam(){
-
+    confirmTeam() {
+      this.$refs['formRef'].validate(valid => {
+        if (valid) {
+          let params = Object.assign({ token: this.$store.state.user.token }, this.formData);
+          this.$http.post('gameTeam/operation', params).then(res => {
+            if (res.retCode == 0) {
+              this.visibleTeam = false;
+              this.formData = {
+                teamName: '',
+                teamContent: '',
+                gameId: '',
+                teamPic: ''
+              }
+              this.$message({ showClose: true, message: "操作成功", type: "success" });
+              this.getList()
+            }
+          })
+        }
+      })
+    },
+    // 编辑战队
+    editTeam(item){
+      this.formData = item;
+      this.visibleTeam = true;
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
-
 </style>
