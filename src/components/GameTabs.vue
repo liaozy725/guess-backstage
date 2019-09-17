@@ -75,12 +75,20 @@ export default {
     },
     // 删除游戏
     tabRemove(name) {
-      this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
+      this.$confirm("此操作将永久删除该游戏, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
       }).then(() => {
-        this.$emit("tabRemove", name);
+        let params = {
+          token:this.$store.state.user.token,
+          id:name
+        }
+        this.$http.post('game/delGame',params).then(res=>{
+          if(res.retCode==0){
+            this.getGameList();
+          }
+        })
       }).catch(() => { });
     },
     // 添加游戏

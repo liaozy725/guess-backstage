@@ -110,6 +110,10 @@ html {
   box-sizing: border-box;
 }
 
+img{
+  object-fit: cover;
+}
+
 #app {
   height: 100%;
 }

@@ -1,7 +1,7 @@
 // 战队管理
 <template>
   <div class="recharge">
-    <game-tabs @tabChange="tabChange" @tabRemove="tabRemove"></game-tabs>
+    <game-tabs @tabChange="tabChange"></game-tabs>
     <div class="search clearfix">
       <el-row :gutter="10">
         <el-col :xs="24" :sm="24" :md="24" :lg="8" :xl="6">
@@ -20,10 +20,24 @@
     <el-card class="box-card">
       <el-table :data="tableData" style="width: 100%" stripe fit highlight-current-row v-loading="tableLoding">
         <el-table-column type="index" :index="indexMethod" width="90" label="序号" header-align="center" align="center"></el-table-column>
-        <el-table-column prop="headImage" label="标题" header-align="center" align="center"></el-table-column>
-        <el-table-column prop="nickName" label="类型" header-align="center" align="center"></el-table-column>
-        <el-table-column prop="mobile" label="默认奖金池" header-align="center" align="center"></el-table-column>
-        <el-table-column prop="mobile" label="抽成" header-align="center" align="center"></el-table-column>
+        <el-table-column prop="title" label="标题" header-align="center" align="center"></el-table-column>
+        <el-table-column prop="type" label="类型" header-align="center" align="center"></el-table-column>
+        <el-table-column prop="percentage" label="抽成" header-align="center" align="center"></el-table-column>
+        <el-table-column prop="createTime" label="创建时间" header-align="center" align="center">
+          <template slot-scope="scope">
+            <span>{{scope.row.createTime | parseTime}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="createTime" label="更新时间" header-align="center" align="center">
+          <template slot-scope="scope">
+            <span>{{scope.row.updateTime | parseTime}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="createTime" label="状态" header-align="center" align="center">
+          <template slot-scope="scope">
+            <span>{{stateObj[scope.row.state]}}</span>
+          </template>
+        </el-table-column>
         <el-table-column label="操作" header-align="center" width="160" align="center">
           <template slot-scope="scope">
             <el-button type="text" size="small">编辑</el-button>
@@ -34,24 +48,22 @@
       <pagination :pageNum="pageNum" :total="total" :pageSize="pageSize" v-on:handleSizeChange="handleSizeChange" v-on:handleCurrentChange="handleCurrentChange"></pagination>
     </el-card>
 
-    <el-dialog :visible.sync="visibleTeam" title="添加竞猜内容" center top="10vh">
+    <el-dialog :visible.sync="visibleTeam" :title="formData.id?'编辑竞猜内容':'添加竞猜内容'" center top="10vh">
       <el-form :model="formData" :rules="callRules" ref="call" label-width="90px" class="demo-dynamic">
-        <el-form-item prop="memo" label="标题">
-          <el-input placeholder="请输入标题" v-model="formData.name"></el-input>
+        <el-form-item prop="title" label="竞猜标题">
+          <el-input placeholder="请输入竞猜标题" v-model="formData.title"></el-input>
         </el-form-item>
-        <el-form-item prop="memo" label="类型" placeholder="请选择类型">
+        <el-form-item prop="type" label="类型" placeholder="请选择类型">
           <el-select v-model="formData.type" style="width:100%">
             <el-option label="战队" value="战队"></el-option>
             <el-option label="单人" value="单人"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item prop="memo" label="资金池">
-          <el-input placeholder="请输入资金池" type="number" v-model="formData.teamNun"></el-input>
+        <el-form-item prop="guessPrice" label="资金池">
+          <el-input placeholder="请输入资金池" type="number" v-model="formData.guessPrice"></el-input>
         </el-form-item>
-        <el-form-item prop="memo" label="抽成">
-          <el-input placeholder="请输入抽成" type="number" v-model="formData.teamNun">
-            <template slot="append">%</template>
-          </el-input>
+        <el-form-item prop="percentage" label="抽成">
+          <el-input placeholder="请输入抽成" type="number" v-model="formData.percentage"></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -76,7 +88,7 @@ export default {
       tableLoding: false,
       total: 0, // 总页数
       pages: 1, // 第一次请求页
-      pageNum: 1, // 当前页数
+      pageNum: 0, // 当前页数
       pageSize: 10, // 每页显示个数
       applyTime: '',
       mobile: '',
@@ -92,7 +104,9 @@ export default {
         name:'',
         teamNun:'',
         type:''
-      }
+      },
+      selectGameId:'',
+      stateObj:{'normal':'正常','freeze':'冻结'}
     }
   },
   created() {
@@ -104,7 +118,7 @@ export default {
     handleSizeChange(pageSize) {
       this.tableData = [];
       this.pageSize = pageSize
-      this.pageNum = 1;
+      this.pageNum = 0;
       this.getList()
     },
     // 分页处理 - 改变 pageNum
@@ -114,16 +128,29 @@ export default {
     },
     // 查询
     selectList(){
-      this.pageNum = 1;
+      this.pageNum = 0;
       this.getList()
     },
     // 获取列表
     getList(){
-
+      var params = {
+        token:this.$store.state.user.token,
+        pageNum:this.pageNum,
+        pageSize:this.pageSize,
+        gameId:this.selectGameId
+      }
+      this.tableLoding = true;
+      this.$http.post('guessContent/list',params).then(res=>{
+        this.tableLoding = false;
+        if(res.retCode==0){
+          this.tableData = res.data;
+        }
+      })
     },
-    // 标签改变
-    tabChange(e){
-
+    // 标签改变 根据游戏来获取列表
+    tabChange(gameId) {
+      this.selectGameId = parseInt(gameId);
+      this.getList();
     },
     // 标签删除
     tabRemove(e){

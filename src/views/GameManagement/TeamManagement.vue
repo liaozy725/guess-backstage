@@ -1,7 +1,7 @@
 // 战队管理
 <template>
   <div class="recharge">
-    <game-tabs @tabChange="tabChange" @tabRemove="tabRemove"></game-tabs>
+    <game-tabs @tabChange="tabChange"></game-tabs>
     <div class="search clearfix">
       <el-row :gutter="10">
         <el-col :xs="24" :sm="24" :md="24" :lg="8" :xl="6">
@@ -13,7 +13,7 @@
       </el-row>
       <div class="oneTerm">
         <div class="serchBtn  pan-btn pink-btn" @click="selectList()">查询</div>
-        <div class="serchBtn  pan-btn green-btn" @click="visibleTeam=true;">添加战队</div>
+        <div class="serchBtn  pan-btn green-btn" @click="addTeam">添加战队</div>
       </div>
     </div>
 
@@ -32,6 +32,11 @@
             <span>{{scope.row.createTime | parseTime}}</span>
           </template>
         </el-table-column>
+        <el-table-column prop="updateTime" label="更新时间" header-align="center" align="center">
+          <template slot-scope="scope">
+            <span>{{scope.row.updateTime | parseTime}}</span>
+          </template>
+        </el-table-column>
         <el-table-column label="操作" header-align="center" width="160" align="center">
           <template slot-scope="scope">
             <el-button type="text" size="small" @click="editTeam(scope.row)">编辑</el-button>
@@ -42,7 +47,7 @@
       <pagination :pageNum="pageNum" :total="total" :pageSize="pageSize" v-on:handleSizeChange="handleSizeChange" v-on:handleCurrentChange="handleCurrentChange"></pagination>
     </el-card>
 
-    <el-dialog :visible.sync="visibleTeam" title="添加战队" center top="10vh" :close-on-click-modal="false">
+    <el-dialog :visible.sync="visibleTeam" :title="this.formData.id?'编辑战队':'添加战队'" center top="10vh" :close-on-click-modal="false">
       <el-form :model="formData" :rules="callRules" ref="formRef" label-width="90px" class="demo-dynamic">
         <el-form-item prop="teamName" label="战队名称">
           <el-input placeholder="请输入战队名称" v-model="formData.teamName"></el-input>
@@ -95,6 +100,7 @@ export default {
         teamPic: 'https://gss0.bdstatic.com/94o3dSag_xI4khGkpoWK1HF6hhy/baike/w%3D268%3Bg%3D0/sign=7105df784dc2d562f208d7ebdf2af7d2/f9198618367adab482d06a5b89d4b31c8701e4a2.jpg'
       },
       selectGameId:'', // 选中的游戏id
+      stateObj:{'normal':'正常','freeze':'冻结'}
     }
   },
   created() {
@@ -129,7 +135,8 @@ export default {
       let params = {
         token: this.$store.state.user.token,
         pageNum: this.pageNum,
-        pageSize: this.pageSize
+        pageSize: this.pageSize,
+        gameId:this.selectGameId
       }
       this.tableLoding = true;
       this.$http.post('gameTeam/list', params).then(res => {
@@ -141,7 +148,7 @@ export default {
     },
     // 标签改变 根据游戏来获取列表
     tabChange(gameId) {
-      this.selectGameId = gameId;
+      this.selectGameId = parseInt(gameId);
       this.getList();
     },
     // 标签删除
@@ -173,6 +180,17 @@ export default {
     editTeam(item){
       this.formData = item;
       this.visibleTeam = true;
+    },
+    // 添加战队
+    addTeam(){
+      this.formData = {
+        teamName: '',
+        teamContent: '',
+        gameId: this.selectGameId,
+        teamPic: '',
+      }
+      this.visibleTeam=true;
+      if(this.$refs['formRef'])this.$refs['formRef'].resetFields();
     }
   }
 }
