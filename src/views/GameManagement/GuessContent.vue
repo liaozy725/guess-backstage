@@ -13,7 +13,7 @@
       </el-row>
       <div class="oneTerm">
         <div class="serchBtn  pan-btn pink-btn" @click="selectList()">查询</div>
-        <div class="serchBtn  pan-btn green-btn" @click="visibleTeam=true;">添加竞猜内容</div>
+        <div class="serchBtn  pan-btn green-btn" @click="addGuess">添加竞猜内容</div>
       </div>
     </div>
 
@@ -40,7 +40,7 @@
         </el-table-column>
         <el-table-column label="操作" header-align="center" width="160" align="center">
           <template slot-scope="scope">
-            <el-button type="text" size="small">编辑</el-button>
+            <el-button type="text" size="small" @click="editGuess(scope.row)">编辑</el-button>
             <el-button type="text" size="small">删除</el-button>
           </template>
         </el-table-column>
@@ -48,15 +48,15 @@
       <pagination :pageNum="pageNum" :total="total" :pageSize="pageSize" v-on:handleSizeChange="handleSizeChange" v-on:handleCurrentChange="handleCurrentChange"></pagination>
     </el-card>
 
-    <el-dialog :visible.sync="visibleTeam" :title="formData.id?'编辑竞猜内容':'添加竞猜内容'" center top="10vh">
-      <el-form :model="formData" :rules="callRules" ref="call" label-width="90px" class="demo-dynamic">
+    <el-dialog :visible.sync="visible" :title="formData.id?'编辑竞猜内容':'添加竞猜内容'" center top="10vh">
+      <el-form :model="formData" :rules="callRules" ref="formRef" label-width="90px" class="demo-dynamic">
         <el-form-item prop="title" label="竞猜标题">
           <el-input placeholder="请输入竞猜标题" v-model="formData.title"></el-input>
         </el-form-item>
         <el-form-item prop="type" label="类型" placeholder="请选择类型">
           <el-select v-model="formData.type" style="width:100%">
-            <el-option label="战队" value="战队"></el-option>
-            <el-option label="单人" value="单人"></el-option>
+            <el-option label="战队" value="1/2"></el-option>
+            <el-option label="单人" value="1/5"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item prop="guessPrice" label="资金池">
@@ -65,10 +65,15 @@
         <el-form-item prop="percentage" label="抽成">
           <el-input placeholder="请输入抽成" type="number" v-model="formData.percentage"></el-input>
         </el-form-item>
+        <el-form-item prop="gameId" label="所属游戏">
+          <el-select v-model="formData.gameId" placeholder="请选择游戏" clearable style="width:100%;">
+            <el-option v-for="item in gameList" :label="item.gameName" :value="item.id"></el-option>
+          </el-select>
+        </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="visibleTeam=false;">取 消</el-button>
-        <el-button type="primary" :loading="btnLoading" @click="confirmTeam()">确 定</el-button>
+        <el-button @click="visible=false;">取 消</el-button>
+        <el-button type="primary" :loading="btnLoading" @click="confirm()">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -94,19 +99,29 @@ export default {
       mobile: '',
       nickName: '',
       realName: '',
-      visibleTeam:false,
+      visible:false,
       btnLoading:false,
       callRules: {
-        name: [{ required: true, message: '请输入战队名称', trigger: 'change' }],
-        teamNun: [{ required: true, message: '请输入战队数', trigger: 'change' }]
+        title: [{ required: true, message: '请输入竞猜标题', trigger: 'blur' }],
+        percentage: [{ required: true, message: '请输入抽成', trigger: 'blur' }],
+        type: [{ required: true, message: '请选择竞猜类型', trigger: 'change' }],
+        gameId: [{ required: true, message: '请选择游戏', trigger: 'change' }],
+        guessPrice: [{ required: true, message: '请输入资金池', trigger: 'blur' }],
       },
       formData:{
-        name:'',
-        teamNun:'',
-        type:''
+        title:'',
+        percentage:'',
+        type:'',
+        guessPrice:'',
+        gameId:''
       },
       selectGameId:'',
       stateObj:{'normal':'正常','freeze':'冻结'}
+    }
+  },
+  computed: {
+    gameList() {
+      return this.$store.state.user.gameList;
     }
   },
   created() {
@@ -157,8 +172,42 @@ export default {
 
     },
     // 确定 添加 /编辑 战队
-    confirmTeam(){
-
+    confirm(){
+      this.$refs['formRef'].validate(valid => {
+        if (valid) {
+          let params = Object.assign({ token: this.$store.state.user.token }, this.formData);
+          this.$http.post('guessContent/operation', params).then(res => {
+            if (res.retCode == 0) {
+              this.visible = false;
+              this.formData = {
+                title:'',
+                percentage:'',
+                type:'',
+                guessPrice:'',
+                gameId:''
+              }
+              this.$message({ showClose: true, message: "操作成功", type: "success" });
+              this.getList()
+            }
+          })
+        }
+      })
+    },
+    // 编辑赛事
+    editGuess(item){
+      this.formData = item;
+      this.visible = true;
+    },
+    // 添加竞猜
+    addGuess(){
+      this.formData = {
+        title: '',
+        content: '',
+        gameId: this.selectGameId,
+        teamPic: ''
+      }
+      this.visible=true;
+      if(this.$refs['formRef'])this.$refs['formRef'].resetFields();
     }
   }
 }

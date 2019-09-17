@@ -188,7 +188,7 @@ export default {
       this.formData = {
         title: '',
         content: '',
-        gameId: '',
+        gameId: this.selectGameId,
         teamPic: ''
       }
       this.visible=true;
