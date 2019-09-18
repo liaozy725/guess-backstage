@@ -55,8 +55,7 @@
         </el-form-item>
         <el-form-item prop="type" label="类型" placeholder="请选择类型">
           <el-select v-model="formData.type" style="width:100%">
-            <el-option label="战队" value="1/2"></el-option>
-            <el-option label="单人" value="1/5"></el-option>
+            <el-option v-for="item in typeArr" :label="item" :value="item"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item prop="guessPrice" label="资金池">
@@ -65,7 +64,7 @@
         <el-form-item prop="percentage" label="抽成">
           <el-input placeholder="请输入抽成" type="number" v-model="formData.percentage"></el-input>
         </el-form-item>
-        <el-form-item prop="gameId" label="所属游戏">
+        <el-form-item prop="gameId" label="游戏">
           <el-select v-model="formData.gameId" placeholder="请选择游戏" clearable style="width:100%;">
             <el-option v-for="item in gameList" :label="item.gameName" :value="item.id"></el-option>
           </el-select>
@@ -101,6 +100,7 @@ export default {
       realName: '',
       visible:false,
       btnLoading:false,
+      typeArr:['1/2','1/3','1/4','1/5','1/6','1/7','1/8','1/9','1/10'],
       callRules: {
         title: [{ required: true, message: '请输入竞猜标题', trigger: 'blur' }],
         percentage: [{ required: true, message: '请输入抽成', trigger: 'blur' }],

@@ -55,7 +55,7 @@
         <el-form-item prop="teamContent" label="战队介绍">
           <el-input placeholder="请输入战队介绍" type="textarea" :autosize="{ minRows: 3}" v-model="formData.teamContent"></el-input>
         </el-form-item>
-        <el-form-item prop="gameId" label="所属游戏">
+        <el-form-item prop="gameId" label="游戏">
           <el-select v-model="formData.gameId" placeholder="请选择游戏" clearable style="width:100%;">
             <el-option v-for="item in gameList" :label="item.gameName" :value="item.id"></el-option>
           </el-select>

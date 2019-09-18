@@ -43,7 +43,7 @@ export default {
   data() {
     return {
       selectedTabs: "",
-      tabList: [],
+      tabList: this.$store.state.user.gameList || [],
       visible: false,
       btnLoading: false,
       callRules: {
@@ -66,7 +66,9 @@ export default {
   },
   components: { Upload },
   created() {
-    this.getGameList();
+    if(!this.$store.state.user.gameList || this.$store.state.user.gameList.length<=0){
+      this.getGameList();
+    }
   },
   methods: {
     // 点击
