@@ -40,27 +40,25 @@
           <el-tab-pane label="第三局" name="4"></el-tab-pane>
         </el-tabs>
         <!-- 总竞猜 -->
-        <div class="guess-list">
+        <div class="guess-list" :style="{height:'40vh',overflow:'auto'}">
           <!-- 循环 这个 -->
           <el-card class="list-box" v-for="item in guessInfo.guessInfoReps">
-            <el-table :data="tableData">
-              <el-table-column prop="headImage" label="标题" header-align="center" align="center"></el-table-column>
-              <el-table-column prop="headImage" label="类型" header-align="center" align="center"></el-table-column>
-              <el-table-column prop="headImage" label="默认资金池" header-align="center" align="center">
+            <el-table :data="[item]">
+              <el-table-column prop="title" label="标题" header-align="center" align="center"></el-table-column>
+              <el-table-column prop="guessType" label="类型" header-align="center" align="center"></el-table-column>
+              <el-table-column prop="guessPrice" label="默认资金池" header-align="center" align="center">
                 <template slot-scope="scope">
-                  <el-input v-model="scope.row.money" type="number" placeholder="默认奖金池"></el-input>
+                  <el-input v-model="scope.row.guessPrice" type="number" placeholder="默认奖金池"></el-input>
                 </template>
               </el-table-column>
               <el-table-column prop="headImage" label="抽成" header-align="center" align="center">
                 <template slot-scope="scope">
-                  <el-input v-model="scope.row.money" type="number" placeholder="抽成">
-                    <template slot="append">%</template>
-                  </el-input>
+                  <el-input v-model="scope.row.percentage" type="number" placeholder="抽成"></el-input>
                 </template>
               </el-table-column>
               <el-table-column prop="headImage" label="玩法" header-align="center" align="center">
                 <template slot-scope="scope">
-                  <el-select v-model="scope.row.money" placeholder="选择玩法">
+                  <el-select v-model="scope.row.playType" placeholder="选择玩法">
                     <el-option label="滚盘" value="滚盘"></el-option>
                     <el-option label="早盘" value="早盘"></el-option>
                   </el-select>
@@ -73,18 +71,11 @@
               </el-table-column>
             </el-table>
             <el-row :gutter="20" class="card-item-list">
-              <el-col :xs="12" :sm="12" :md="12" :lg="12" :xl="12">
-                <span class="item-l">RNG</span>
+              <el-col v-for="col in item.odds" :xs="12" :sm="12" :md="12" :lg="12" :xl="12">
+                <span class="item-l">{{col.teamName}}</span>
                 <div class="item-r">
                   <label>赔率：</label>
-                  <el-input v-model="formData.game" type="number" clearable placeholder="赔率"></el-input>
-                </div>
-              </el-col>
-              <el-col :xs="12" :sm="12" :md="12" :lg="12" :xl="12">
-                <span class="item-l">RNG</span>
-                <div class="item-r">
-                  <label>赔率：</label>
-                  <el-input v-model="formData.game" type="number" clearable placeholder="赔率"></el-input>
+                  <el-input v-model="col.value" type="number" clearable placeholder="赔率"></el-input>
                 </div>
               </el-col>
             </el-row>
@@ -141,6 +132,8 @@ export default {
     },
     // 完成
     submit() {
+      console.log(this.guessInfo);
+      
       this.$emit("handleConfirm")
     },
     handleTabClick() {
@@ -157,12 +150,31 @@ export default {
         if (res.retCode == 0) {
           try {
             res.data.team = JSON.parse(res.data.team);
+            res.data.guessInfoReps.forEach(ele => {
+              ele.newGuessPrice = initJSONData(ele.newGuessPrice,res.data.team);
+              ele.odds = initJSONData(ele.odds,res.data.team);
+            });
           } catch (error) {
 
           }
+          console.log(res.data);
+          
           this.guessInfo = res.data;
         }
       })
+      // 解析JSON数据，并做处理
+      function initJSONData(json,teamObj){
+        let obj = JSON.parse(json);
+        let returnArr = [];
+        for (let key in obj) {
+          returnArr.push({
+            teamId:key,
+            teamName: teamObj[key],
+            value: obj[key]
+          })
+        }
+        return returnArr;
+      }
     }
   },
   watch: {

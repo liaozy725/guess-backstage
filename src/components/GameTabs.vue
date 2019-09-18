@@ -68,6 +68,9 @@ export default {
   created() {
     if(!this.$store.state.user.gameList || this.$store.state.user.gameList.length<=0){
       this.getGameList();
+    }else{
+      this.selectedTabs = this.$store.state.user.gameList[0].id+'';
+            this.$emit("tabChange",this.selectedTabs);
     }
   },
   methods: {
