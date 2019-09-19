@@ -13,7 +13,7 @@
       </el-row>
       <div class="oneTerm">
         <div class="serchBtn  pan-btn pink-btn" @click="selectList()">查询</div>
-        <div class="serchBtn  pan-btn green-btn" @click="addGuessVisible=true;">添加竞猜</div>
+        <div class="serchBtn  pan-btn green-btn" @click="addGuessVisible=true;guessId='';">添加竞猜</div>
       </div>
     </div>
 
@@ -36,6 +36,7 @@
         <el-table-column prop="state" label="状态" header-align="center" align="center"></el-table-column>
         <el-table-column label="操作" header-align="center" width="160" align="center">
           <template slot-scope="scope">
+            <!-- <el-button type="text" size="small" @click="editGuess1(scope.row)">编辑竞猜</el-button> -->
             <el-button type="text" size="small" @click="getDetail(scope.row,false)">查看</el-button>
           </template>
         </el-table-column>
@@ -43,7 +44,7 @@
       <pagination :pageNum="pageNum" :total="total" :pageSize="pageSize" v-on:handleSizeChange="handleSizeChange" v-on:handleCurrentChange="handleCurrentChange"></pagination>
     </el-card>
     <!-- 添加竞猜 -->
-    <add-guess :selectGameId="selectGameId" :visible="addGuessVisible" @handleClose="addGuessVisible = false;" @handleConfirm="handleConfirmAdd"></add-guess>
+    <add-guess :guessId="guessId" :selectGameId="selectGameId" :visible="addGuessVisible" @handleClose="addGuessVisible = false;" @handleConfirm="handleConfirmAdd"></add-guess>
     <!-- 编辑竞猜详情 -->
     <edit-guess :guessId="guessId" :visible="editGuessVisible" @handleClose="editGuessVisible = false;" @handleConfirm="handleConfirmEdit"></edit-guess>
     <!-- 操作竞猜 -->
@@ -150,7 +151,11 @@ export default {
     getDetail(item, isEdit) {
       this.guessId = item.id;
       this.editGuessVisible = true;
-
+    },
+    // 编辑竞猜第一步
+    editGuess1(item){
+      // this.guessId = item.id;
+      this.addGuessVisible = true;
     }
   }
 }

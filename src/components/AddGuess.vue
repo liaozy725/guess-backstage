@@ -45,6 +45,9 @@ export default {
     },
     selectGameId: {
       default: ''
+    },
+    guessId: {
+      default: ''
     }
   },
   data() {
@@ -146,6 +149,12 @@ export default {
       this.formData.matchId = '';
       this.getMatchList();
       this.getTeamList();
+    },
+    // 监听选中游戏改变
+    guessId(newVal) {
+      if(this.visible){
+        
+      }
     }
   }
 }

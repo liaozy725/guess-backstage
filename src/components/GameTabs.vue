@@ -66,17 +66,18 @@ export default {
   },
   components: { Upload },
   created() {
-    if(!this.$store.state.user.gameList || this.$store.state.user.gameList.length<=0){
+    if (!this.$store.state.user.gameList || this.$store.state.user.gameList.length <= 0) {
       this.getGameList();
-    }else{
-      this.selectedTabs = this.$store.state.user.gameList[0].id+'';
-            this.$emit("tabChange",this.selectedTabs);
+    } else {
+      this.selectedTabs = this.$store.state.app.activeGameTab || this.$store.state.user.gameList[0].id + '';
+      this.$emit("tabChange", this.selectedTabs);
     }
   },
   methods: {
     // 点击
     tabClick(e) {
-      this.$emit("tabChange",e.name);
+      this.$emit("tabChange", e.name);
+      this.$store.commit('setActiveGameTab', e.name)
     },
     // 删除游戏
     tabRemove(name) {
@@ -86,11 +87,11 @@ export default {
         type: "warning"
       }).then(() => {
         let params = {
-          token:this.$store.state.user.token,
-          id:name
+          token: this.$store.state.user.token,
+          id: name
         }
-        this.$http.post('game/delGame',params).then(res=>{
-          if(res.retCode==0){
+        this.$http.post('game/delGame', params).then(res => {
+          if (res.retCode == 0) {
             this.getGameList();
           }
         })
@@ -125,11 +126,12 @@ export default {
       this.$http.post("game/list", params).then(res => {
         if (res.retCode == 0) {
           this.tabList = res.data;
-          if(res.data.length>0){
-            this.selectedTabs = res.data[0].id+'';
-            this.$emit("tabChange",this.selectedTabs);
+          if (res.data.length > 0) {
+            this.selectedTabs = res.data[0].id + '';
+            this.$store.commit('setActiveGameTab', this.selectedTabs)
+            this.$emit("tabChange", this.selectedTabs);
           }
-          this.$store.commit('setGameList',this.tabList);
+          this.$store.commit('setGameList', this.tabList);
         }
       });
     },

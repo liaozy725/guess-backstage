@@ -7,7 +7,8 @@ const app = {
       withoutAnimation: false
     },
     device: 'desktop',
-    visitedViews: []
+    visitedViews: [],
+    activeGameTab:''
   },
   mutations: {
     // 侧边栏显示隐藏
@@ -61,6 +62,10 @@ const app = {
     DEL_ALL_VIEWS: (state) => {
       state.visitedViews = []
       state.cachedViews = []
+    },
+    // 设置选中游戏
+    setActiveGameTab(state,tab){
+      state.activeGameTab = tab;
     }
   },
   actions: {

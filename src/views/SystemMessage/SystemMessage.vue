@@ -127,20 +127,23 @@ export default {
     },
     // 删除
     deleteItem(item) {
-      let params = {
-        id: item.id,
-        token: this.$store.getters.token
-      };
-      this.$http.post("sysNotice/delete", params).then(res => {
-        if (res.retCode == 0) {
-          this.$message({
-            showClose: true,
-            message: "操作成功",
-            type: "success"
-          });
-          this.getList();
-        }
-      });
+      this.$confirm('此操作将永久删除该消息, 是否继续?', '提示').then(() => {
+        let params = {
+          id: item.id,
+          token: this.$store.getters.token
+        };
+        this.$http.post("sysNotice/delete", params).then(res => {
+          if (res.retCode == 0) {
+            this.$message({
+              showClose: true,
+              message: "操作成功",
+              type: "success"
+            });
+            this.getList();
+          }
+        });
+      }).catch(() => { })
+
     },
     // 修改
     uploadItem(item) {
@@ -151,9 +154,8 @@ export default {
       };
       this.visible = true;
     },
+    // 保存消息
     saveOrUpdate() {
-      console.log(this.$refs["ruleForm"]);
-
       this.$refs["ruleForm"].validate(valid => {
         if (valid) {
           let params = {

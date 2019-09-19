@@ -25,7 +25,7 @@
         </el-col>
       </el-row>
       <el-row :gutter="20">
-        <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12" class="flex-item">
+        <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" class="flex-item">
           <label class="tit">战队:</label>
           <span>
             <el-tag class="team-tag" v-for="(value,key,index) in guessInfo.team">{{value}}</el-tag>
@@ -34,17 +34,20 @@
       </el-row>
       <el-card class="guess-list-container" shadow="never">
         <el-tabs v-model="activeTab" @tab-click="handleTabClick">
-          <el-tab-pane label="总竞猜" name="first"></el-tab-pane>
-          <el-tab-pane label="第一局" name="2"></el-tab-pane>
-          <el-tab-pane label="第二局" name="3"></el-tab-pane>
-          <el-tab-pane label="第三局" name="4"></el-tab-pane>
+          <el-tab-pane label="总竞猜" name="all"></el-tab-pane>
+          <el-tab-pane v-for="tab in guessInfo.number" :label="'第'+tab+'局'" :name="tab+''"></el-tab-pane>
         </el-tabs>
         <!-- 总竞猜 -->
         <div class="guess-list" :style="{height:'40vh',overflow:'auto'}">
           <!-- 循环 这个 -->
           <el-card class="list-box" v-for="item in guessInfo.guessInfoReps">
             <el-table :data="[item]">
-              <el-table-column prop="title" label="标题" header-align="center" align="center"></el-table-column>
+              <el-table-column prop="title" label="标题" header-align="center" align="center">
+                <template slot-scope="scope">
+                  <span>{{scope.row.title}}</span>
+                  <span v-if="activeTab=='all'"> (第{{scope.row.number}}局)</span>
+                </template>
+              </el-table-column>
               <el-table-column prop="guessType" label="类型" header-align="center" align="center"></el-table-column>
               <el-table-column prop="guessPrice" label="默认资金池" header-align="center" align="center">
                 <template slot-scope="scope">
@@ -59,14 +62,17 @@
               <el-table-column prop="headImage" label="玩法" header-align="center" align="center">
                 <template slot-scope="scope">
                   <el-select v-model="scope.row.playType" placeholder="选择玩法">
-                    <el-option label="滚盘" value="滚盘"></el-option>
-                    <el-option label="早盘" value="早盘"></el-option>
+                    <el-option label="滚盘" value="1"></el-option>
+                    <el-option label="早盘" value="2"></el-option>
                   </el-select>
                 </template>
               </el-table-column>
-              <el-table-column label="操作" header-align="center" width="80" align="center">
+              <el-table-column label="操作" header-align="center" width="200" align="center">
                 <template slot-scope="scope">
-                  <el-button type="text" size="small" @click="deleteItem()">删除</el-button>
+                  <el-button size="small" type="danger" @click="deleteGuessItem(item)">删除</el-button>
+                  <el-button size="small" type="success" @click="saveGuessItem(item)">保存</el-button>
+                  <el-button size="small" type="warning" @click="saveGuessItem(item)">封盘</el-button>
+                  <el-button size="small" type="primary" @click="saveGuessItem(item)">结算</el-button>
                 </template>
               </el-table-column>
             </el-table>
@@ -120,7 +126,7 @@ export default {
         teamIds: '',
         teamNames: ''
       },
-      activeTab: 'first',
+      activeTab: 'all', // 获取第几局数据
       tableData: [1],
       guessInfo: {}
     }
@@ -136,16 +142,17 @@ export default {
       
       this.$emit("handleConfirm")
     },
-    handleTabClick() {
-
+    handleTabClick(e) {
+      this.activeTab = e.name;
+      this.getGuessInfo(this.activeTab)
     },
     // 获取竞猜详情
-    getGuessInfo(number) {
+    getGuessInfo() {
       let params = {
         token: this.$store.state.user.token,
-        guessId: this.guessId
+        guessId: this.guessId,
+        number: this.activeTab =='all'?'':this.activeTab
       }
-      if (number) params.number = number;
       this.$http.post('guess/info', params).then(res => {
         if (res.retCode == 0) {
           try {
@@ -157,8 +164,6 @@ export default {
           } catch (error) {
 
           }
-          console.log(res.data);
-          
           this.guessInfo = res.data;
         }
       })
@@ -174,6 +179,18 @@ export default {
           })
         }
         return returnArr;
+      }
+    },
+    // 保存竞猜修改
+    saveGuessItem(item){
+      this.$set(item,'isSaved',true);
+      console.log(item);
+      let params = {
+        token:this.$store.state.user.token,
+        guessInfoId:item.guessPrice,
+        percentage:item.percentage,
+        playType:item.playType,
+        playType:item.playType,
       }
     }
   },
