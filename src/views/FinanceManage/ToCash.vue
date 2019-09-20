@@ -48,6 +48,7 @@
 <script>
 import Pagination from "@/components/Pagination.vue";
 import { indexMethod } from "@/utils/vx";
+import func from '../../../../../xpc_web/lettle-fat-car-backstage/vue-temp/vue-editor-bridge';
 export default {
   components: {
     Pagination
@@ -62,6 +63,7 @@ export default {
       pageSize: 10, // 每页显示个数
       mobile: "",
       stateObj:{'applying':'申请中','agree':'同意','refuse':'拒绝'},
+      selectId:''
     };
   },
   created() {
@@ -101,6 +103,22 @@ export default {
     },
     // 操作
     auditWithdraw(row){
+
+      this.selectId = row.id;
+      this.$msgbox({
+        title:'提现审核',
+        message:'是否同意该条提现申请？',
+        type:'warning',
+        showCancelButton:true,
+        cancelButtonText:'拒绝',
+        confirmButtonText:'同意'
+      }).then(()=>{
+        this.submitAudit('agree')
+      }).catch(()=>[
+        this.submitAudit('refuse')
+      ])
+    },
+    submitAudit(withdrawState){
       
     }
   }
