@@ -138,7 +138,7 @@ export default {
     },
     // 分页处理 - 改变 pageNum
     handleCurrentChange(pageNum) {
-      this.pageNum = pageNum;
+      this.pageNum = pageNum -1;
       this.getList()
     },
     // 查询
