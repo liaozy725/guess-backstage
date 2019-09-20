@@ -134,11 +134,7 @@ export default {
         };
         this.$http.post("sysNotice/delete", params).then(res => {
           if (res.retCode == 0) {
-            this.$message({
-              showClose: true,
-              message: "操作成功",
-              type: "success"
-            });
+            this.$message({ showClose: true, message: "操作成功", type: "success" });
             this.getList();
           }
         });
@@ -175,11 +171,7 @@ export default {
                 title: ""
               };
               this.visible = false;
-              this.$message({
-                showClose: true,
-                message: "操作成功",
-                type: "success"
-              });
+              this.$message({ showClose: true, message: "操作成功", type: "success" });
               this.getList();
             }
           });

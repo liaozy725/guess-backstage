@@ -36,7 +36,7 @@
         </el-table-column>
         <el-table-column label="操作" header-align="center" width="160" align="center">
           <template slot-scope="scope">
-            <el-button type="text" size="small" @click="auditWithdraw(scope.row)">操作</el-button>
+            <el-button type="text" size="small" v-if="scope.row.withdrawState != 'agree'" @click="auditWithdraw(scope.row)">操作</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -48,7 +48,6 @@
 <script>
 import Pagination from "@/components/Pagination.vue";
 import { indexMethod } from "@/utils/vx";
-import func from '../../../../../xpc_web/lettle-fat-car-backstage/vue-temp/vue-editor-bridge';
 export default {
   components: {
     Pagination
@@ -62,8 +61,8 @@ export default {
       pageNum: 0, // 当前页数
       pageSize: 10, // 每页显示个数
       mobile: "",
-      stateObj:{'applying':'申请中','agree':'同意','refuse':'拒绝'},
-      selectId:''
+      stateObj: { 'applying': '申请中', 'agree': '同意', 'refuse': '拒绝' },
+      selectId: ''
     };
   },
   created() {
@@ -102,24 +101,32 @@ export default {
       });
     },
     // 操作
-    auditWithdraw(row){
-
-      this.selectId = row.id;
+    auditWithdraw(row) {
       this.$msgbox({
-        title:'提现审核',
-        message:'是否同意该条提现申请？',
-        type:'warning',
-        showCancelButton:true,
-        cancelButtonText:'拒绝',
-        confirmButtonText:'同意'
-      }).then(()=>{
-        this.submitAudit('agree')
-      }).catch(()=>[
-        this.submitAudit('refuse')
+        title: '提现审核',
+        message: '是否同意该条提现申请？',
+        type: 'warning',
+        showCancelButton: true,
+        cancelButtonText: '拒绝',
+        confirmButtonText: '同意'
+      }).then(() => {
+        this.submitAudit(row.id, 'agree')
+      }).catch(() => [
+        this.submitAudit(row.id, 'refuse')
       ])
     },
-    submitAudit(withdrawState){
-      
+    submitAudit(id, withdrawState) {
+      let params = {
+        token: this.$store.state.user.token,
+        id: id,
+        withdrawState: withdrawState
+      }
+      this.$http.post('withdraw/audit', params).then(res => {
+        if (res.retCode == 0) {
+          this.$message({ showClose: true, message: "操作成功", type: "success" });
+          this.getList();
+        }
+      })
     }
   }
 };
