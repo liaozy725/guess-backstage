@@ -165,6 +165,7 @@ export function parseTime(time, cFormat) {
     }
     return value || 0
   })
+  if (time_str == '0-0-0 0:0:0') return '';
   return time_str
 }
 // 模板时间

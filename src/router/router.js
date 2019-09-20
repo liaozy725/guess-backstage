@@ -52,7 +52,7 @@ var router = new Router({
       path: '/UserManage',
       component: Layout,
       redirect: '/UserManage/UserList',
-      icon: 'icon-user',
+      icon: 'icon-yonghu',
       name: '用户管理',
       children: [
         {path: 'UserList',component: _import('UserManage/UserList'),meta: {keepAlive: true},name: '用户列表'}
@@ -62,7 +62,7 @@ var router = new Router({
       path: '/orderManage',
       component: Layout,
       redirect: '/orderManage/orderList',
-      icon: 'icon-user',
+      icon: 'icon-menu-ddgl-normal',
       name: '订单管理',
       children: [
         {path: 'orderList',component: _import('orderManage/orderList'),meta: {keepAlive: true},name: '订单列表'}

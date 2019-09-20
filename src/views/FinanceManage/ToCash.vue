@@ -1,19 +1,21 @@
 // 财务管理
 <template>
   <div class="recharge">
-    <!-- <div class="search clearfix">
+    <div class="search clearfix">
       <el-row :gutter="10">
         <el-col :xs="24" :sm="24" :md="24" :lg="8" :xl="6">
           <div class="item">
-            <span class="tit">手机号</span>
-            <el-input clearable v-model="mobile" placeholder="请输入手机号" @keyup.enter.native="selectList()"></el-input>
+            <span class="tit">状态</span>
+            <el-select v-model="withdrawState" clearable placeholder='请选择状态' style="width:100%;">
+              <el-option v-for="(value,key,index) in stateObj" :label="value" :value="key" :key="key"></el-option>
+            </el-select>
           </div>
         </el-col>
       </el-row>
       <div class="oneTerm">
         <div class="serchBtn pan-btn pink-btn" @click="selectList()">查询</div>
       </div>
-    </div> -->
+    </div>
 
     <el-card class="box-card">
       <el-table :data="tableData" style="width: 100%" stripe fit highlight-current-row v-loading="tableLoding">
@@ -36,7 +38,7 @@
         </el-table-column>
         <el-table-column label="操作" header-align="center" width="160" align="center">
           <template slot-scope="scope">
-            <el-button type="text" size="small" v-if="scope.row.withdrawState != 'agree'" @click="auditWithdraw(scope.row)">操作</el-button>
+            <el-button type="text" size="small" v-if="scope.row.withdrawState == 'applying'" @click="auditWithdraw(scope.row)">审核</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -62,7 +64,7 @@ export default {
       pageSize: 10, // 每页显示个数
       mobile: "",
       stateObj: { 'applying': '申请中', 'agree': '同意', 'refuse': '拒绝' },
-      selectId: ''
+      withdrawState: ''
     };
   },
   created() {
@@ -92,7 +94,8 @@ export default {
       let params = {
         pageSize: this.pageSize,
         pageNum: this.pageNum,
-        token: this.$store.getters.token
+        token: this.$store.getters.token,
+        withdrawState: this.withdrawState
       };
       this.$http.post("withdraw/queryList", params).then(res => {
         if (res.retCode == 0) {
