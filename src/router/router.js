@@ -59,6 +59,16 @@ var router = new Router({
       ]
     },
     {
+      path: '/orderManage',
+      component: Layout,
+      redirect: '/orderManage/orderList',
+      icon: 'icon-user',
+      name: '订单管理',
+      children: [
+        {path: 'orderList',component: _import('orderManage/orderList'),meta: {keepAlive: true},name: '订单列表'}
+      ]
+    },
+    {
       path: '/FinanceManage',
       component: Layout,
       redirect: '/FinanceManage/Survey',
