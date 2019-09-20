@@ -37,7 +37,7 @@
         <el-table-column label="操作" header-align="center" width="160" align="center">
           <template slot-scope="scope">
             <!-- <el-button type="text" size="small" @click="editGuess1(scope.row)">编辑竞猜</el-button> -->
-            <el-button type="text" size="small" @click="getDetail(scope.row,false)">查看</el-button>
+            <el-button type="text" size="small" @click="getDetail(scope.row,false)">详情</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -46,7 +46,7 @@
     <!-- 添加竞猜 -->
     <add-guess :guessId="guessId" :selectGameId="selectGameId" :visible="addGuessVisible" @handleClose="addGuessVisible = false;" @handleConfirm="handleConfirmAdd"></add-guess>
     <!-- 编辑竞猜详情 -->
-    <edit-guess :guessId="guessId" :visible="editGuessVisible" @handleClose="editGuessVisible = false;" @handleConfirm="handleConfirmEdit"></edit-guess>
+    <edit-guess :guessId="guessId" :visible="editGuessVisible" @handleClose="editGuessVisible = false;guessId='';" @handleConfirm="handleConfirmEdit"></edit-guess>
     <!-- 操作竞猜 -->
     <handle-guess :visible="handleGuessVisible" @handleClose="handleGuessVisible = false;" @handleConfirm="handleConfirmHandle"></handle-guess>
   </div>

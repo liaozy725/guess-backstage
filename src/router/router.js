@@ -67,7 +67,7 @@ var router = new Router({
       children: [
         {path: 'Survey',component: _import('FinanceManage/Survey'),meta: {keepAlive: true},name: '概况'},
         {path: 'Recharge',component: _import('FinanceManage/Recharge'),meta: {keepAlive: true},name: '充值'},
-        {path: 'ToCash',component: _import('FinanceManage/ToCash'),meta: {keepAlive: true},name: '提现'}
+        {path: 'ToCash',component: _import('FinanceManage/ToCash'),meta: {keepAlive: true},name: '提现审核'}
       ]
     },
     {

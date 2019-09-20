@@ -15,11 +15,11 @@
           <el-form ref="formInline" :model="formInline" :rules="ruleInline" autocomplete="off">
             <el-form-item prop="user">
               <div class="form-title">用户名</div>
-              <el-input type="text" v-model="formInline.accountLogin" placeholder style="width: 300px" clearable></el-input>
+              <el-input type="text" v-model="formInline.accountLogin" placeholder="请输入用户名"  @keyup.enter.native="handleSubmit" style="width: 300px" clearable></el-input>
             </el-form-item>
             <el-form-item prop="password">
               <div class="form-title">密码</div>
-              <el-input v-model="formInline.accountPassword" placeholder style="width: 300px" type="password" clearable></el-input>
+              <el-input v-model="formInline.accountPassword" placeholder="请输入密码"  @keyup.enter.native="handleSubmit" style="width: 300px" type="password" clearable></el-input>
             </el-form-item>
             <el-form-item>
               <el-button type="primary" @click="handleSubmit()" round style="width: 180px;" class="loginBtn">登录</el-button>

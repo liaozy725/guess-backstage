@@ -1,25 +1,25 @@
 <template>
   <div class="add-guess">
     <!-- 第二步 -->
-    <el-dialog :visible.sync="visible" title="添加竞猜" center top="10vh" width="1000px" :before-close="beforeClose" :close-on-click-modal="false">
+    <el-dialog :visible.sync="visible" title="添加竞猜" center top="6vh" width="1200px" :before-close="beforeClose" :close-on-click-modal="false">
       <el-row :gutter="20">
-        <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12" class="flex-item">
+        <el-col :xs="12" :sm="12" :md="8" :lg="8" :xl="8" class="flex-item">
           <label class="tit">游戏:</label>
           <span>{{guessInfo.gameName}}</span>
         </el-col>
-        <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12" class="flex-item">
+        <el-col :xs="12" :sm="12" :md="8" :lg="8" :xl="8" class="flex-item">
           <label class="tit">比赛时间:</label>
           <span>{{guessInfo.matchTime | parseTime}}</span>
         </el-col>
-        <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12" class="flex-item">
+        <el-col :xs="12" :sm="12" :md="8" :lg="8" :xl="8" class="flex-item">
           <label class="tit">赛事:</label>
           <span>{{guessInfo.matchName}}</span>
         </el-col>
-        <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12" class="flex-item">
+        <el-col :xs="12" :sm="12" :md="8" :lg="8" :xl="8" class="flex-item">
           <label class="tit">比赛名称:</label>
           <span>{{guessInfo.name}}</span>
         </el-col>
-        <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12" class="flex-item">
+        <el-col :xs="12" :sm="12" :md="8" :lg="8" :xl="8" class="flex-item">
           <label class="tit">局数:</label>
           <span>{{guessInfo.number}}</span>
         </el-col>
@@ -38,7 +38,7 @@
           <el-tab-pane v-for="tab in guessInfo.number" :label="'第'+tab+'局'" :name="tab+''"></el-tab-pane>
         </el-tabs>
         <!-- 总竞猜 -->
-        <div class="guess-list" :style="{height:'40vh',overflow:'auto'}">
+        <div class="guess-list" ref="guessList" :style="{height:'50vh',overflow:'auto'}">
           <!-- 循环 这个 -->
           <el-card class="list-box" v-for="item in guessInfo.guessInfoReps">
             <el-table :data="[item]">
@@ -51,37 +51,42 @@
               <el-table-column prop="guessType" label="类型" header-align="center" align="center"></el-table-column>
               <el-table-column prop="guessPrice" label="默认资金池" header-align="center" align="center">
                 <template slot-scope="scope">
-                  <el-input v-model="scope.row.guessPrice" type="number" placeholder="默认奖金池"></el-input>
+                  <el-input v-model="scope.row.guessPrice" :disabled="item.isSealed=='y'" type="number" placeholder="默认奖金池"></el-input>
                 </template>
               </el-table-column>
               <el-table-column prop="headImage" label="抽成" header-align="center" align="center">
                 <template slot-scope="scope">
-                  <el-input v-model="scope.row.percentage" type="number" placeholder="抽成"></el-input>
+                  <el-input v-model="scope.row.percentage" :disabled="item.isSealed=='y'" type="number" placeholder="抽成"></el-input>
                 </template>
               </el-table-column>
               <el-table-column prop="headImage" label="玩法" header-align="center" align="center">
                 <template slot-scope="scope">
-                  <el-select v-model="scope.row.playType" placeholder="选择玩法">
-                    <el-option label="滚盘" value="1"></el-option>
-                    <el-option label="早盘" value="2"></el-option>
+                  <el-select v-model="scope.row.playType" :disabled="item.isSealed=='y'" placeholder="选择玩法">
+                    <el-option label="滚盘" :value="1"></el-option>
+                    <el-option label="早盘" :value="2"></el-option>
                   </el-select>
                 </template>
               </el-table-column>
-              <el-table-column label="操作" header-align="center" width="200" align="center">
+              <el-table-column label="操作" header-align="center" width="210" align="center">
                 <template slot-scope="scope">
-                  <el-button size="small" type="danger" @click="deleteGuessItem(item)">删除</el-button>
-                  <el-button size="small" type="success" @click="saveGuessItem(item)">保存</el-button>
-                  <el-button size="small" type="warning" @click="saveGuessItem(item)">封盘</el-button>
-                  <el-button size="small" type="primary" @click="saveGuessItem(item)">结算</el-button>
+                  <el-button size="small" @click="deleteGuessItem(item)" v-if="item.isSealed !='y'">删除</el-button>
+                  <el-button size="small" type="warning" @click="saveGuessItem(item,'n')" v-if="item.isSealed !='y'">保存</el-button>
+                  <el-button size="small" type="danger" @click="saveGuessItem(item,'y')" v-if="item.isSealed !='y'">封盘</el-button>
+                  <el-button size="small" type="primary" @click="saveGuessItem(item,'y')" v-if="item.isSealed =='y'">结算</el-button>
                 </template>
               </el-table-column>
             </el-table>
             <el-row :gutter="20" class="card-item-list">
-              <el-col v-for="col in item.odds" :xs="12" :sm="12" :md="12" :lg="12" :xl="12">
-                <span class="item-l">{{col.teamName}}</span>
+              <el-col v-for="odd in item.odds" :xs="12" :sm="12" :md="12" :lg="12" :xl="12">
+                <span class="item-l">{{odd.teamName}}</span>
                 <div class="item-r">
                   <label>赔率：</label>
-                  <el-input v-model="col.value" type="number" clearable placeholder="赔率"></el-input>
+                  <el-input v-model="odd.value" :disabled="item.isSealed=='y'" type="number" clearable placeholder="赔率"></el-input>
+                  <span>{{odd.newGuessPrice}}USDT</span>
+                </div>
+                <div class="item-btns" v-if="item.isSealed =='y'">
+                  <el-button size="small" type="success" round>胜利</el-button>
+                  <i class="iconfont icon-jiesuo"></i>
                 </div>
               </el-col>
             </el-row>
@@ -138,28 +143,39 @@ export default {
     },
     // 完成
     submit() {
-      console.log(this.guessInfo);
-      
       this.$emit("handleConfirm")
     },
     handleTabClick(e) {
       this.activeTab = e.name;
-      this.getGuessInfo(this.activeTab)
+      this.getGuessInfo(this.activeTab);
+      this.$refs['guessList'].scrollTop=0;
     },
     // 获取竞猜详情
     getGuessInfo() {
       let params = {
         token: this.$store.state.user.token,
         guessId: this.guessId,
-        number: this.activeTab =='all'?'':this.activeTab
+        number: this.activeTab == 'all' ? '' : this.activeTab
       }
       this.$http.post('guess/info', params).then(res => {
         if (res.retCode == 0) {
           try {
             res.data.team = JSON.parse(res.data.team);
             res.data.guessInfoReps.forEach(ele => {
-              ele.newGuessPrice = initJSONData(ele.newGuessPrice,res.data.team);
-              ele.odds = initJSONData(ele.odds,res.data.team);
+              ele.newGuessPrice = initJSONData(ele.newGuessPrice, res.data.team);
+              ele.odds = initJSONData(ele.odds, res.data.team);
+              for (let i = 0; i < ele.odds.length; i++) {
+                if(ele.odds[i].teamId == ele.newGuessPrice[i].teamId){
+                  ele.odds[i].newGuessPrice = ele.newGuessPrice[i].value
+                }else{
+                  let idx = ele.newGuessPrice.some((el)=>{
+                    return el.teamId == ele.odds[i].teamId
+                  })
+                  if(idx>=0){
+                    ele.odds[i].newGuessPrice = ele.newGuessPrice[idx].value
+                  }
+                }
+              }
             });
           } catch (error) {
 
@@ -168,12 +184,12 @@ export default {
         }
       })
       // 解析JSON数据，并做处理
-      function initJSONData(json,teamObj){
+      function initJSONData(json, teamObj) {
         let obj = JSON.parse(json);
         let returnArr = [];
         for (let key in obj) {
           returnArr.push({
-            teamId:key,
+            teamId: key,
             teamName: teamObj[key],
             value: obj[key]
           })
@@ -182,28 +198,43 @@ export default {
       }
     },
     // 保存竞猜修改
-    saveGuessItem(item){
-      this.$set(item,'isSaved',true);
-      console.log(item);
+    saveGuessItem(item, isSealed) {
       let params = {
-        token:this.$store.state.user.token,
-        guessInfoId:item.guessPrice,
-        percentage:item.percentage,
-        playType:item.playType,
-        playType:item.playType,
+        token: this.$store.state.user.token,
+        guessInfoId: item.id,
+        guessPrice: item.guessPrice,
+        percentage: item.percentage,
+        playType: item.playType,
+        isSealed: isSealed,
       }
+      let ids = [], odds = [];
+      item.odds.forEach(ele => {
+        ids.push(ele.teamId);
+        odds.push(ele.value);
+      });
+      params.gameTeamIds = ids.join();
+      params.odds = odds.join();
+      this.$http.post('guess/update', params).then(res => {
+        if (res.retCode == 0) {
+          this.$message({ showClose: true, message: "操作成功", type: "success" });
+          this.getGuessInfo();
+        }
+      })
     }
   },
   watch: {
     // 监听选中游戏改变
     guessId(newVal) {
-      this.getGuessInfo();
+      if(newVal){
+        this.getGuessInfo();
+      }
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
+@import '@/style/variables.scss';
 .add-guess {
   .guess-list-container {
     .guess-list {
@@ -216,19 +247,41 @@ export default {
             display: flex;
             align-items: center;
             padding: 10px;
+            padding-left: 0 !important;
             padding-right: 0 !important;
             border-top: 1px solid #999;
             .item-l {
-              flex: 0 0 150px;
+              flex: 0 0 90px;
+              height: 40px;
+              vertical-align: middle;
+              line-height: 40px;
+              display: inline-block;
+              padding-left: 10px;
             }
             .item-r {
               flex: 1;
               .el-input {
-                width: 150px;
+                width: 90px;
+              }
+              span{
+                font-size: 14px;
+                display: inline-block;
+                width: 190px;
+                text-align: center;
               }
             }
-            &:nth-child(2n + 1) .item-r {
-              border-right: 1px solid #ccc;
+            .item-btns{
+              width: 100px;
+              .iconfont{
+                margin-left: 10px;
+                font-size: 24px;
+                color: $defaultBule;
+                vertical-align: middle;
+                cursor: pointer;
+              }
+            }
+            &:nth-child(2n) .item-l {
+              border-left: 1px solid #ccc;
             }
             &:nth-child(1),
             &:nth-child(2) {
