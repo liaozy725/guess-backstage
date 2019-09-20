@@ -90,9 +90,12 @@ export default {
         pageNum: this.pageNum,
         token: this.$store.getters.token
       };
+      this.tableLoding = true;
       this.$http.post("userInfo/list", params).then(res => {
+        this.tableLoding = false;
         if (res.retCode == 0) {
           this.tableData = res.data;
+          this.total = parseInt(res.pageCount);
         }
       });
     },

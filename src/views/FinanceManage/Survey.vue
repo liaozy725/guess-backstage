@@ -48,7 +48,6 @@ export default {
       tableData: [],
       tableLoding: false,
       total: 0, // 总页数
-      pages: 1, // 第一次请求页
       pageNum: 0, // 当前页数
       pageSize: 10, // 每页显示个数
       mobile: "",
@@ -84,9 +83,12 @@ export default {
         pageNum: this.pageNum,
         token: this.$store.getters.token
       };
+      this.tableLoding = true;
       this.$http.post("userBalanceInfo/list", params).then(res => {
+        this.tableLoding = false;
         if (res.retCode == 0) {
           this.tableData = res.data;
+          this.total = parseInt(res.pageCount);
         }
       });
     },

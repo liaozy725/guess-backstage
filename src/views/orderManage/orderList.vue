@@ -110,6 +110,7 @@ export default {
         this.tableLoding=false;
         if (res.retCode == 0) {
           this.tableData = res.data;
+          this.total = parseInt(res.pageCount);
         }
       });
     }

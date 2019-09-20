@@ -124,6 +124,7 @@ export default {
             }
           });
           this.tableData = res.data;
+          this.total = parseInt(res.pageCount);
         }
       })
     },

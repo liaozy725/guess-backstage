@@ -97,9 +97,12 @@ export default {
         token: this.$store.getters.token,
         withdrawState: this.withdrawState
       };
+      this.tableLoding = true;
       this.$http.post("withdraw/queryList", params).then(res => {
+        this.tableLoding = false;
         if (res.retCode == 0) {
           this.tableData = res.data;
+          this.total = parseInt(res.pageCount);
         }
       });
     },

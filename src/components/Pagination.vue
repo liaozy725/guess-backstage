@@ -1,13 +1,13 @@
 <template>
   <div :class="{pageination:device=='mobile'}">
-    <el-pagination @size-change="handleSizeChange" :pager-count="5" @current-change="handleCurrentChange" :current-page="currentPage"  :page-size="this.pageSize" :page-sizes="this.pageSizes" :layout="layoutItem" :total="this.total" class="right" background>
+    <el-pagination @size-change="handleSizeChange" :pager-count="5" @current-change="handleCurrentChange" :current-page="currentPage" :page-count='pageCount'  :page-size="this.pageSize" :page-sizes="this.pageSizes" :layout="layoutItem" :total="this.total" class="right" background>
     </el-pagination>
   </div>
 </template>
 
 <script>
 export default {
-  props: ['total', 'currentPage', 'pageSize','pageSizes'],
+  props: ['total', 'currentPage', 'pageSize','pageSizes', 'pageCount'],
   data() {
     return {
     };
