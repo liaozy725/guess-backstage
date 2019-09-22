@@ -40,7 +40,7 @@ axios.interceptors.response.use(response=>{
       return response.data;
     }else if(response.data.retCode=='10002'){
       store.commit("setToken",'');
-      router.replace('/login');
+      router.replace('/jc/login');
     }else{
       Message({
         showClose: true, message: response.data.errorMsg || '请求异常', type: 'error', duration: 4 * 1000

@@ -1,8 +1,8 @@
 <template>
   <div class="upload-container">
-    <el-upload action='' :http-request="httpRequest" :disabled="disabled" :limit="limit" :drag="drag" :show-file-list="showFileList" :multiple="multiple" :accept="accept" :file-list="fileList" :on-exceed='onExceed'>
-      <!-- <slot></slot> -->
-      <i class="iconfont icon-tianjia-"></i>
+    <el-upload action='' :http-request="httpRequest" :with-credentials="true" :list-type="listType" :disabled="disabled" :limit="limit" :drag="drag" :show-file-list="showFileList" :multiple="multiple" :accept="accept" :file-list="fileList" :on-exceed='onExceed' :on-success="onSuccess" :on-remove="onRemove">
+      <!-- <img :src="imgUrl" v-if="(!limit || limit == 1) && imgUrl" alt=""> -->
+      <i class="el-icon-plus"></i>
     </el-upload>
     <div class="uploading" v-if="showLoading && uploading">
 
@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import OSS from 'ali-oss'
+// import OSS from 'ali-oss'
 export default {
   props: {
     // 接受上传的文件类型 audio/*   video/*  image/*
@@ -27,7 +27,7 @@ export default {
     // 是否显示上传文件列表
     showFileList: {
       type: Boolean,
-      default: false
+      default: true
     },
     // 是否禁用
     disabled: {
@@ -48,6 +48,18 @@ export default {
     showLoading: {
       type: Boolean,
       default: false
+    },
+    // 
+    listType:{
+      type:String,
+      default:'text'
+    },
+    // 已上传的文件列表  文件回填
+    fileListData:{
+      type: Array,
+      default:()=>{
+        return [];
+      }
     }
   },
   data() {
@@ -60,7 +72,8 @@ export default {
       uploading: false,
       fileList: [],
       returnArr: [],
-      ossSign: {}
+      ossSign: {},
+      imgUrl:''
     }
   },
   created() {
@@ -68,7 +81,7 @@ export default {
   },
   methods: {
     initOss() {
-      this.$http.post('common/alioss/get_sign').then(res => {
+      this.$http.post('common/alioss/distribute_token').then(res => {
         if(res.retCode==0){
           this.ossSign = res.data;
         }
@@ -89,27 +102,42 @@ export default {
     },
     // 上传文件
     uploadFile(file, res) {
-      var client = new OSS({
-        accessKeyId: res.accessid,
-        accessKeySecret: 'asditDlr12axrE45ydA5xb9qTpeQh3',
+      var client = new OSS.Wrapper({
+        region:'oss-cn-hongkong',
+        accessKeyId: res.accessKeyId,
+        accessKeySecret: res.accessKeySecret,
         success_action_status: '200',
-        callback: res.callback,
-        signature: res.signature,
+        stsToken:res.securityToken,
         bucket: 'ipfsoss'
       });
+      // 生成图片名字 时间戳 + 随即字符串
       var fileName = Date.parse(new Date());
       var randStr = this.randomString(6);
       var arr = file.file.name.split('.');
-      client.put(res.dir + fileName + randStr + '.' + arr[arr.length - 1], file.file).then(res => {
-        console.log("图片上传完成",res);
-        
+      console.log(file);
+      
+      client.multipartUpload('jingcai/'+fileName + randStr + '.' + arr[arr.length - 1],file.file).then(rst=>{
         this.uploading = false;
-        this.uploadEnd(res)
+        // this.uploadEnd(rst.res.requestUrls);
+        file.onSuccess(rst.res);
+      }).catch(err=>{
+
       })
     },
     // 上传完成回调
     uploadEnd(res) {
-      this.$emit('uploadSuccess', res);
+      
+    },
+    // element 上传成功
+    onSuccess(response, file, fileList){
+      if(!this.limit || this.limit==1){
+        this.imgUrl = response.requestUrls[0];
+      }
+      this.$emit('uploadSuccess', response.requestUrls);
+    },
+    // 文件移除回调
+    onRemove(file, fileList){
+      this.$emit('uploadRemove', {file,fileList});
     },
     // 文件超出个数限制时的钩子
     onExceed(fileList) {
@@ -118,6 +146,11 @@ export default {
         type: 'warning',
         duration: 1200
       });
+    }
+  },
+  watch:{
+    fileListData(newV){
+      this.fileList = newV;
     }
   }
 }
@@ -133,29 +166,5 @@ export default {
   right: 0;
   background-color: rgba(0, 0, 0, 0.4);
   z-index: 999;
-}
->>> .el-upload {
-  border: 1px dashed #d9d9d9;
-  border-radius: 6px;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-  width: 120px;
-  height: 120px;
-}
->>> .el-upload:hover {
-  border-color: #409eff;
-}
->>> .el-upload .iconfont{
-  font-size: 38px;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  color: #d9d9d9;
-  transform: translate(-50%,-50%);
-}
-
->>> .el-upload:hover .iconfont{
-  color: #409eff;
 }
 </style>

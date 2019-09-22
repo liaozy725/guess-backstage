@@ -9,9 +9,10 @@ import 'nprogress/nprogress.css' // Progress 进度条样式
 Vue.use(Router);
 
 var router = new Router({
+  mode: 'history',
   routes: [
     {
-      path: '/login',
+      path: '/jc/login',
       component: _import('Other/login'),
       noDropdown: true,
       hidden: true
@@ -19,15 +20,15 @@ var router = new Router({
     {
       path: '',
       component: Layout,
-      redirect: '/GameManagement',
+      redirect: '/jc/GameManagement',
       icon: 'el-icon-edit',
       noDropdown: true,
       hidden: true
     }, 
     {
-      path: '/GameManagement',
+      path: '/jc/GameManagement',
       component: Layout,
-      redirect: '/GameManagement/TeamManagement',
+      redirect: '/jc/GameManagement/TeamManagement',
       icon: 'icon-youxiguanli',
       name: '游戏管理',
       children: [
@@ -37,7 +38,7 @@ var router = new Router({
       ]
     }, 
     {
-      path: '/GuessManage',
+      path: '/jc/GuessManage',
       component: Layout,
       redirect: '/GuessManage/AllGuess',
       icon: 'icon-jingcai',
@@ -49,7 +50,7 @@ var router = new Router({
       ]
     }, 
     {
-      path: '/UserManage',
+      path: '/jc/UserManage',
       component: Layout,
       redirect: '/UserManage/UserList',
       icon: 'icon-yonghu',
@@ -59,7 +60,7 @@ var router = new Router({
       ]
     },
     {
-      path: '/orderManage',
+      path: '/jc/orderManage',
       component: Layout,
       redirect: '/orderManage/orderList',
       icon: 'icon-menu-ddgl-normal',
@@ -69,7 +70,7 @@ var router = new Router({
       ]
     },
     {
-      path: '/FinanceManage',
+      path: '/jc/FinanceManage',
       component: Layout,
       redirect: '/FinanceManage/Survey',
       icon: 'icon-caiwuguanli',
@@ -81,9 +82,9 @@ var router = new Router({
       ]
     },
     {
-      path: '/SystemMessage',
+      path: '/jc/SystemMessage',
       component: Layout,
-      redirect: '/SystemMessage/SystemMessage',
+      redirect: '/jc/SystemMessage/SystemMessage',
       icon: 'icon-xitongxiaoxi',
       name: '系统消息',
       children: [

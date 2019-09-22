@@ -47,7 +47,7 @@
       <pagination :pageNum="pageNum" :total="total" :pageSize="pageSize" v-on:handleSizeChange="handleSizeChange" v-on:handleCurrentChange="handleCurrentChange"></pagination>
     </el-card>
 
-    <el-dialog :visible.sync="visibleTeam" :title="this.formData.id?'编辑战队':'添加战队'" center top="10vh" :close-on-click-modal="false">
+    <el-dialog :visible.sync="visibleTeam" :title="this.formData.id?'编辑战队':'添加战队'" center top="10vh" :before-close="()=>{fileListData=[];visibleTeam=false;}" :close-on-click-modal="false">
       <el-form :model="formData" :rules="callRules" ref="formRef" label-width="90px" class="demo-dynamic">
         <el-form-item prop="teamName" label="战队名称">
           <el-input placeholder="请输入战队名称" v-model="formData.teamName"></el-input>
@@ -59,6 +59,9 @@
           <el-select v-model="formData.gameId" placeholder="请选择游戏" clearable style="width:100%;">
             <el-option v-for="item in gameList" :label="item.gameName" :value="item.id"></el-option>
           </el-select>
+        </el-form-item>
+        <el-form-item prop="gameId" label="战队图标">
+          <upload accept="image/*" :fileListData="fileListData" listType="picture-card" :limit="1" :multiple="false" @uploadSuccess="uploadSuccess" @uploadRemove="uploadRemove"></upload>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -72,10 +75,11 @@
 <script>
 import Pagination from '@/components/Pagination.vue'
 import GameTabs from '@/components/GameTabs.vue'
+import Upload from '@/components/Upload.vue'
 import { indexMethod } from '@/utils/vx'
 export default {
   components: {
-    Pagination, GameTabs
+    Pagination, GameTabs, Upload
   },
   data() {
     return {
@@ -97,10 +101,11 @@ export default {
         teamName: '',
         teamContent: '',
         gameId: '',
-        teamPic: 'https://gss0.bdstatic.com/94o3dSag_xI4khGkpoWK1HF6hhy/baike/w%3D268%3Bg%3D0/sign=7105df784dc2d562f208d7ebdf2af7d2/f9198618367adab482d06a5b89d4b31c8701e4a2.jpg'
+        teamPic: ''
       },
       selectGameId:'', // 选中的游戏id
-      stateObj:{'normal':'正常','freeze':'冻结'}
+      stateObj:{'normal':'正常','freeze':'冻结'},
+      fileListData:[] // 图片回填
     }
   },
   created() {
@@ -156,6 +161,14 @@ export default {
     tabRemove(e) {
 
     },
+    // 上传图片回调
+    uploadSuccess(res) {
+      this.formData.teamPic = res[0];
+    },
+    // 图片删除回调
+    uploadRemove(res){
+      this.formData.teamPic = '';
+    },
     // 确定 添加 /编辑 战队
     confirmTeam() {
       this.$refs['formRef'].validate(valid => {
@@ -181,6 +194,7 @@ export default {
     editTeam(item){
       this.formData = item;
       this.visibleTeam = true;
+      this.fileListData = [{name:'',url:this.formData.teamPic}];
     },
     // 添加战队
     addTeam(){

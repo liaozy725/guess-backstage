@@ -16,7 +16,7 @@
           <el-input placeholder="请输入游戏名称" type="number" v-model="formData.peopleNum"></el-input>
         </el-form-item>
         <el-form-item prop="gamePic" label="游戏图标">
-          <upload accept="image/*" :limit="1" :multiple="false" @uploadSuccess="uploadSuccess"></upload>
+          <upload accept="image/*" listType="picture-card" :limit="1" :multiple="false" @uploadSuccess="uploadSuccess" @uploadRemove="uploadRemove"></upload>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -60,7 +60,8 @@ export default {
       formData: {
         gameName: "",
         number: "",
-        peopleNum: ""
+        peopleNum: "",
+        gamePic:''
       }
     };
   },
@@ -105,7 +106,7 @@ export default {
     confirmAddTabs() {
       this.$refs['addGameForm'].validate(valid => {
         if (valid) {
-          let params = Object.assign({ gamePic: '//ossweb-img.qq.com/images/lol/v3/logo.png', token: this.$store.getters.token }, this.formData);
+          let params = Object.assign({token: this.$store.getters.token }, this.formData);
           this.$http.post('game/operation', params).then(res => {
             if (res.retCode == 0) {
               this.visible = false;
@@ -137,8 +138,11 @@ export default {
     },
     // 上传图片回调
     uploadSuccess(res) {
-      console.log(res);
-
+      this.formData.gamePic = res[0];
+    },
+    // 图片删除回调
+    uploadRemove(res){
+      this.formData.gamePic = '';
     }
   }
 };
