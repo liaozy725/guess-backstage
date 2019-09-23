@@ -49,7 +49,7 @@
                 </template>
               </el-table-column>
               <el-table-column prop="guessType" label="类型" header-align="center" align="center"></el-table-column>
-              <el-table-column prop="guessPrice" label="默认资金池" header-align="center" align="center">
+              <el-table-column prop="guessPrice" label="默认奖池" header-align="center" align="center">
                 <template slot-scope="scope">
                   <el-input v-model="scope.row.guessPrice" :disabled="item.isSealed=='y'" type="number" placeholder="默认奖金池"></el-input>
                 </template>
@@ -82,10 +82,10 @@
                 <div class="item-r">
                   <label>赔率：</label>
                   <el-input v-model="odd.value" :disabled="item.isSealed=='y'" type="number" clearable placeholder="赔率"></el-input>
-                  <span>{{odd.newGuessPrice}}USDT</span>
+                  <span>￥{{odd.newGuessPrice}}</span>
                 </div>
                 <div class="item-btns" v-if="item.isSealed =='y'">
-                  <el-button size="small" type="success" round>胜利</el-button>
+                  <el-button size="small" type="success" round @click="updateGuessWin(item,odd)">胜利</el-button>
                   <i class="iconfont icon-jiesuo"></i>
                 </div>
               </el-col>
@@ -219,6 +219,41 @@ export default {
           this.$message({ showClose: true, message: "操作成功", type: "success" });
           this.getGuessInfo();
         }
+      })
+    },
+    // 删除竞猜
+    deleteGuessItem(item){
+      this.$confirm("此操作将永久该竞猜, 是否继续?", "提示").then(()=>{
+        let params = {
+          token: this.$store.state.user.token,
+          id:item.id
+        }
+        this.$http.post('guess/guessDel',params).then(res=>{
+          if(res.retCode==0){
+            this.getGuessInfo();
+            this.$message({ showClose: true, message: "操作成功", type: "success" });
+          }
+        })
+      }).catch(()=>{
+
+      })
+    },
+    // 竞猜胜负 设置胜利队伍
+    updateGuessWin(guess,team){
+      this.$confirm(`此操作将设置${team.teamName}为胜利, 是否继续?`, "提示").then(()=>{
+        let params = {
+          token: this.$store.state.user.token,
+          guessInfoId:item.id,
+          gameTeamId:team.teamId
+        }
+        this.$http.post('guess/updateGuessWin',params).then(res=>{
+          if(res.retCode==0){
+            this.getGuessInfo();
+            this.$message({ showClose: true, message: "操作成功", type: "success" });
+          }
+        })
+      }).catch(()=>{
+
       })
     }
   },

@@ -78,6 +78,7 @@ export default {
   },
   created() {
     this.initOss();
+    this.fileList = this.fileListData;
   },
   methods: {
     initOss() {
