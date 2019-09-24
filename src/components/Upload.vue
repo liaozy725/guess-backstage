@@ -115,11 +115,9 @@ export default {
       var fileName = Date.parse(new Date());
       var randStr = this.randomString(6);
       var arr = file.file.name.split('.');
-      console.log(file);
-      
+
       client.multipartUpload('jingcai/'+fileName + randStr + '.' + arr[arr.length - 1],file.file).then(rst=>{
         this.uploading = false;
-        // this.uploadEnd(rst.res.requestUrls);
         file.onSuccess(rst.res);
       }).catch(err=>{
 

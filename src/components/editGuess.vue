@@ -49,16 +49,9 @@
                 </template>
               </el-table-column>
               <el-table-column prop="guessType" label="类型" header-align="center" align="center"></el-table-column>
-              <el-table-column prop="guessPrice" label="默认奖池" header-align="center" align="center">
-                <template slot-scope="scope">
-                  <el-input v-model="scope.row.guessPrice" :disabled="item.isSealed=='y'" type="number" placeholder="默认奖金池"></el-input>
-                </template>
-              </el-table-column>
-              <el-table-column prop="headImage" label="抽成" header-align="center" align="center">
-                <template slot-scope="scope">
-                  <el-input v-model="scope.row.percentage" :disabled="item.isSealed=='y'" type="number" placeholder="抽成"></el-input>
-                </template>
-              </el-table-column>
+              <el-table-column prop="guessPrice" label="初始资金池" header-align="center" align="center"></el-table-column>
+              <el-table-column prop="bonusPrice" label="总奖金池" header-align="center" align="center"></el-table-column>
+              <el-table-column prop="percentage" label="抽成" header-align="center" align="center"></el-table-column>
               <el-table-column prop="headImage" label="玩法" header-align="center" align="center">
                 <template slot-scope="scope">
                   <el-select v-model="scope.row.playType" :disabled="item.isSealed=='y'" placeholder="选择玩法">
@@ -223,7 +216,7 @@ export default {
     },
     // 删除竞猜
     deleteGuessItem(item){
-      this.$confirm("此操作将永久该竞猜, 是否继续?", "提示").then(()=>{
+      this.$confirm("此操作将永久删除此条竞猜, 是否继续?", "提示").then(()=>{
         let params = {
           token: this.$store.state.user.token,
           id:item.id
