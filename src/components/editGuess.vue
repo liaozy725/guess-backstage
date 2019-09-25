@@ -236,7 +236,7 @@ export default {
       this.$confirm(`此操作将设置${team.teamName}为胜利, 是否继续?`, "提示").then(()=>{
         let params = {
           token: this.$store.state.user.token,
-          guessInfoId:item.id,
+          guessInfoId:guess.id,
           gameTeamId:team.teamId
         }
         this.$http.post('guess/updateGuessWin',params).then(res=>{
