@@ -65,7 +65,7 @@
                   <el-button size="small" @click="deleteGuessItem(item)" v-if="item.isSealed !='y'">删除</el-button>
                   <el-button size="small" type="warning" @click="saveGuessItem(item,'n')" v-if="item.isSealed !='y'">保存</el-button>
                   <el-button size="small" type="danger" @click="saveGuessItem(item,'y')" v-if="item.isSealed !='y'">封盘</el-button>
-                  <el-button size="small" type="primary" @click="saveGuessItem(item,'y')" v-if="item.isSealed =='y'">结算</el-button>
+                  <el-button size="small" type="primary" @click="jiesuan(item)" v-if="item.isSealed =='y' && item.matchResult == 2">结算</el-button>
                 </template>
               </el-table-column>
             </el-table>
@@ -77,9 +77,9 @@
                   <el-input v-model="odd.value" :disabled="item.isSealed=='y'" type="number" clearable placeholder="赔率"></el-input>
                   <span>￥{{odd.newGuessPrice}}</span>
                 </div>
-                <div class="item-btns" v-if="item.isSealed =='y'">
-                  <el-button size="small" type="success" round @click="updateGuessWin(item,odd)">胜利</el-button>
-                  <i class="iconfont icon-jiesuo"></i>
+                <div class="item-btns">
+                  <el-button size="small" v-if="item.isSealed =='y'" type="success" round @click="updateGuessWin(item,odd)">胜利</el-button>
+                  <i class="iconfont icon-jiesuo" v-else @click="toggleLock(item,odd,'y')"></i>
                 </div>
               </el-col>
             </el-row>
@@ -141,7 +141,7 @@ export default {
     handleTabClick(e) {
       this.activeTab = e.name;
       this.getGuessInfo(this.activeTab);
-      this.$refs['guessList'].scrollTop=0;
+      this.$refs['guessList'].scrollTop = 0;
     },
     // 获取竞猜详情
     getGuessInfo() {
@@ -158,13 +158,13 @@ export default {
               ele.newGuessPrice = initJSONData(ele.newGuessPrice, res.data.team);
               ele.odds = initJSONData(ele.odds, res.data.team);
               for (let i = 0; i < ele.odds.length; i++) {
-                if(ele.odds[i].teamId == ele.newGuessPrice[i].teamId){
+                if (ele.odds[i].teamId == ele.newGuessPrice[i].teamId) {
                   ele.odds[i].newGuessPrice = ele.newGuessPrice[i].value
-                }else{
-                  let idx = ele.newGuessPrice.some((el)=>{
+                } else {
+                  let idx = ele.newGuessPrice.some((el) => {
                     return el.teamId == ele.odds[i].teamId
                   })
-                  if(idx>=0){
+                  if (idx >= 0) {
                     ele.odds[i].newGuessPrice = ele.newGuessPrice[idx].value
                   }
                 }
@@ -198,7 +198,7 @@ export default {
         guessPrice: item.guessPrice,
         percentage: item.percentage,
         playType: item.playType,
-        isSealed: isSealed,
+        isSealed: isSealed
       }
       let ids = [], odds = [];
       item.odds.forEach(ele => {
@@ -214,46 +214,78 @@ export default {
         }
       })
     },
+    // 锁定 / 解锁 
+    toggleLock(item, guess, isSealed) {
+      let params = {
+        token: this.$store.state.user.token,
+        guessInfoId: item.id,
+        guessPrice: item.guessPrice,
+        percentage: item.percentage,
+        playType: item.playType,
+        isSealed: isSealed,
+        gameTeamIds: guess.teamId,
+        odds: guess.value
+      }
+      this.$http.post('guess/update', params).then(res => {
+        if (res.retCode == 0) {
+          this.$message({ showClose: true, message: "操作成功", type: "success" });
+          this.getGuessInfo();
+        }
+      })
+    },
     // 删除竞猜
-    deleteGuessItem(item){
-      this.$confirm("此操作将永久删除此条竞猜, 是否继续?", "提示").then(()=>{
+    deleteGuessItem(item) {
+      this.$confirm("此操作将永久删除此条竞猜, 是否继续?", "提示").then(() => {
         let params = {
           token: this.$store.state.user.token,
-          id:item.id
+          id: item.id
         }
-        this.$http.post('guess/guessDel',params).then(res=>{
-          if(res.retCode==0){
+        this.$http.post('guess/guessDel', params).then(res => {
+          if (res.retCode == 0) {
             this.getGuessInfo();
             this.$message({ showClose: true, message: "操作成功", type: "success" });
           }
         })
-      }).catch(()=>{
+      }).catch(() => {
 
       })
     },
     // 竞猜胜负 设置胜利队伍
-    updateGuessWin(guess,team){
-      this.$confirm(`此操作将设置${team.teamName}为胜利, 是否继续?`, "提示").then(()=>{
+    updateGuessWin(guess, team) {
+      this.$confirm(`此操作将设置${team.teamName}为胜利, 是否继续?`, "提示").then(() => {
         let params = {
           token: this.$store.state.user.token,
-          guessInfoId:guess.id,
-          gameTeamId:team.teamId
+          guessInfoId: guess.id,
+          gameTeamId: team.teamId
         }
-        this.$http.post('guess/updateGuessWin',params).then(res=>{
-          if(res.retCode==0){
+        this.$http.post('guess/updateGuessWin', params).then(res => {
+          if (res.retCode == 0) {
             this.getGuessInfo();
             this.$message({ showClose: true, message: "操作成功", type: "success" });
           }
         })
-      }).catch(()=>{
+      }).catch(() => {
 
+      })
+    },
+    // 结算
+    jiesuan(item) {
+      let params = {
+        token: this.$store.state.user.token,
+        guessInfoId: item.id
+      }
+      this.$http.post('guess/jiesuan', params).then(res => {
+        if (res.retCode == 0) {
+          this.getGuessInfo();
+          this.$message({ showClose: true, message: "操作成功", type: "success" });
+        }
       })
     }
   },
   watch: {
     // 监听选中游戏改变
     guessId(newVal) {
-      if(newVal){
+      if (newVal) {
         this.getGuessInfo();
       }
     }
@@ -262,7 +294,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '@/style/variables.scss';
+@import "@/style/variables.scss";
 .add-guess {
   .guess-list-container {
     .guess-list {
@@ -291,16 +323,16 @@ export default {
               .el-input {
                 width: 90px;
               }
-              span{
+              span {
                 font-size: 14px;
                 display: inline-block;
                 width: 190px;
                 text-align: center;
               }
             }
-            .item-btns{
+            .item-btns {
               width: 100px;
-              .iconfont{
+              .iconfont {
                 margin-left: 10px;
                 font-size: 24px;
                 color: $defaultBule;
