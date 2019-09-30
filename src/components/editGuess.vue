@@ -70,7 +70,7 @@
               </el-table-column>
             </el-table>
             <el-row :gutter="20" class="card-item-list">
-              <el-col v-for="odd in item.odds" :xs="12" :sm="12" :md="12" :lg="12" :xl="12">
+              <el-col v-for="(odd,idx) in item.odds" :xs="12" :sm="12" :md="12" :lg="12" :xl="12">
                 <span class="item-l">{{odd.teamName}}</span>
                 <div class="item-r">
                   <label>赔率：</label>
@@ -79,7 +79,8 @@
                 </div>
                 <div class="item-btns">
                   <el-button size="small" v-if="item.isSealed =='y'" type="success" round @click="updateGuessWin(item,odd)">胜利</el-button>
-                  <i class="iconfont icon-jiesuo" v-else @click="toggleLock(item,odd,'y')"></i>
+                  <i class="iconfont icon-suo" v-if="item.isSealed != 'y'" @click="toggleLock(item,odd,'y')"></i>
+                  <i class="iconfont icon-jiesuo" v-else></i>
                 </div>
               </el-col>
             </el-row>
@@ -152,28 +153,28 @@ export default {
       }
       this.$http.post('guess/info', params).then(res => {
         if (res.retCode == 0) {
-          try {
-            res.data.team = JSON.parse(res.data.team);
-            res.data.guessInfoReps.forEach(ele => {
-              ele.newGuessPrice = initJSONData(ele.newGuessPrice, res.data.team);
-              ele.odds = initJSONData(ele.odds, res.data.team);
-              for (let i = 0; i < ele.odds.length; i++) {
-                if (ele.odds[i].teamId == ele.newGuessPrice[i].teamId) {
-                  ele.odds[i].newGuessPrice = ele.newGuessPrice[i].value
-                } else {
-                  let idx = ele.newGuessPrice.some((el) => {
-                    return el.teamId == ele.odds[i].teamId
-                  })
-                  if (idx >= 0) {
-                    ele.odds[i].newGuessPrice = ele.newGuessPrice[idx].value
-                  }
-                }
-              }
-            });
-          } catch (error) {
+          res.data.team = JSON.parse(res.data.team)
+          res.data.guessInfoReps.forEach(ele => {
+            console.log(initJSON(ele.isSealed, ele.newGuessPrice, ele.odds, res.data.team));
 
-          }
+            // ele.newGuessPrice = initJSONData(ele.newGuessPrice, res.data.team);
+            // ele.odds = initJSONData(ele.odds, res.data.team);
+            // for (let i = 0; i < ele.odds.length; i++) {
+            //   if (ele.odds[i].teamId == ele.newGuessPrice[i].teamId) {
+            //     ele.odds[i].newGuessPrice = ele.newGuessPrice[i].value
+            //   } else {
+            //     let idx = ele.newGuessPrice.some((el) => {
+            //       return el.teamId == ele.odds[i].teamId
+            //     })
+            //     if (idx >= 0) {
+            //       ele.odds[i].newGuessPrice = ele.newGuessPrice[idx].value
+            //     }
+            //   }
+            // }
+          });
           this.guessInfo = res.data;
+          console.log(this.guessInfo);
+
         }
       })
       // 解析JSON数据，并做处理
@@ -184,9 +185,29 @@ export default {
           returnArr.push({
             teamId: key,
             teamName: teamObj[key],
-            value: obj[key]
+            value: obj[key],
+            isSealed: teamObj[key]
           })
         }
+        return returnArr;
+      }
+      function initJSON(isSealedJSON, newGuessPriceJSON, oddsJSON, teamObj) {
+        let sealed = JSON.parse(isSealedJSON);
+        let guessPrice = JSON.parse(newGuessPriceJSON);
+        let odds = JSON.parse(oddsJSON);
+        console.log(sealed, guessPrice, odds);
+        let returnArr = [];
+        for (let key in odds) {
+          returnArr.push({
+            teamId: key,
+            teamName: teamObj[key],
+            odd: odds[key],
+            isSealed: sealed[key],
+            price: guessPrice[key]
+          })
+        }
+        console.log(returnArr);
+
         return returnArr;
       }
     },
@@ -219,12 +240,8 @@ export default {
       let params = {
         token: this.$store.state.user.token,
         guessInfoId: item.id,
-        guessPrice: item.guessPrice,
-        percentage: item.percentage,
-        playType: item.playType,
         isSealed: isSealed,
-        gameTeamIds: guess.teamId,
-        odds: guess.value
+        gameTeamIds: guess.teamId
       }
       this.$http.post('guess/update', params).then(res => {
         if (res.retCode == 0) {

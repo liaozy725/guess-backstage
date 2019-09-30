@@ -98,7 +98,16 @@ export default {
           params.teamNames = teamNames.join();
           this.$http.post('guess/operation', params).then(res => {
             if (res.retCode == 0) {
-              this.$emit("handleConfirm")
+              this.formData = {
+                gameId: '',
+                matchId: '',
+                name: '',
+                number: '',
+                matchTime: '',
+                teamIds: '',
+                teamNames: ''
+              };
+              this.$emit("handleConfirm");
             }
           })
         }
@@ -152,8 +161,8 @@ export default {
     },
     // 监听选中游戏改变
     guessId(newVal) {
-      if(this.visible){
-        
+      if (this.visible) {
+
       }
     }
   }
