@@ -62,25 +62,25 @@
               </el-table-column>
               <el-table-column label="操作" header-align="center" width="210" align="center">
                 <template slot-scope="scope">
-                  <el-button size="small" @click="deleteGuessItem(item)" v-if="item.isSealed !='y'">删除</el-button>
-                  <el-button size="small" type="warning" @click="saveGuessItem(item,'n')" v-if="item.isSealed !='y'">保存</el-button>
-                  <el-button size="small" type="danger" @click="saveGuessItem(item,'y')" v-if="item.isSealed !='y'">封盘</el-button>
-                  <el-button size="small" type="primary" @click="jiesuan(item)" v-if="item.isSealed =='y' && item.matchResult == 2">结算</el-button>
+                  <el-button size="small" @click="deleteGuessItem(item)" v-if="item.isSealed.includes('n')">删除</el-button>
+                  <el-button size="small" type="warning" @click="saveGuessItem(item,'n')" v-if="item.isSealed.includes('n')">保存</el-button>
+                  <el-button size="small" type="danger" @click="saveGuessItem(item,'y')" v-if="item.isSealed.includes('n')">封盘</el-button>
+                  <el-button size="small" type="primary" @click="jiesuan(item)" v-if="!item.isSealed.includes('n') && item.matchResult == 2">结算</el-button>
                 </template>
               </el-table-column>
             </el-table>
             <el-row :gutter="20" class="card-item-list">
-              <el-col v-for="(odd,idx) in item.odds" :xs="12" :sm="12" :md="12" :lg="12" :xl="12">
-                <span class="item-l">{{odd.teamName}}</span>
+              <el-col v-for="(ele,idx) in item.details" :xs="12" :sm="12" :md="12" :lg="12" :xl="12">
+                <span class="item-l">{{ele.teamName}}</span>
                 <div class="item-r">
                   <label>赔率：</label>
-                  <el-input v-model="odd.value" :disabled="item.isSealed=='y'" type="number" clearable placeholder="赔率"></el-input>
-                  <span>￥{{odd.newGuessPrice}}</span>
+                  <el-input v-model="ele.odd" :disabled="item.isSealed=='y'" type="number" clearable placeholder="赔率"></el-input>
+                  <span>￥{{ele.price}}</span>
                 </div>
                 <div class="item-btns">
-                  <el-button size="small" v-if="item.isSealed =='y'" type="success" round @click="updateGuessWin(item,odd)">胜利</el-button>
-                  <i class="iconfont icon-suo" v-if="item.isSealed != 'y'" @click="toggleLock(item,odd,'y')"></i>
-                  <i class="iconfont icon-jiesuo" v-else></i>
+                  <el-button size="small" v-if="!item.isSealed.includes('n')" type="success" round @click="updateGuessWin(item,ele)">胜利</el-button>
+                  <i class="iconfont icon-jiesuo" v-if="ele.isSealed != 'y'" @click="toggleLock(item,ele,'y')"></i>
+                  <i class="iconfont icon-suo" v-else></i>
                 </div>
               </el-col>
             </el-row>
@@ -155,22 +155,7 @@ export default {
         if (res.retCode == 0) {
           res.data.team = JSON.parse(res.data.team)
           res.data.guessInfoReps.forEach(ele => {
-            console.log(initJSON(ele.isSealed, ele.newGuessPrice, ele.odds, res.data.team));
-
-            // ele.newGuessPrice = initJSONData(ele.newGuessPrice, res.data.team);
-            // ele.odds = initJSONData(ele.odds, res.data.team);
-            // for (let i = 0; i < ele.odds.length; i++) {
-            //   if (ele.odds[i].teamId == ele.newGuessPrice[i].teamId) {
-            //     ele.odds[i].newGuessPrice = ele.newGuessPrice[i].value
-            //   } else {
-            //     let idx = ele.newGuessPrice.some((el) => {
-            //       return el.teamId == ele.odds[i].teamId
-            //     })
-            //     if (idx >= 0) {
-            //       ele.odds[i].newGuessPrice = ele.newGuessPrice[idx].value
-            //     }
-            //   }
-            // }
+            ele.details = initJSON(ele.isSealed, ele.newGuessPrice, ele.odds, res.data.team)
           });
           this.guessInfo = res.data;
           console.log(this.guessInfo);
@@ -178,24 +163,10 @@ export default {
         }
       })
       // 解析JSON数据，并做处理
-      function initJSONData(json, teamObj) {
-        let obj = JSON.parse(json);
-        let returnArr = [];
-        for (let key in obj) {
-          returnArr.push({
-            teamId: key,
-            teamName: teamObj[key],
-            value: obj[key],
-            isSealed: teamObj[key]
-          })
-        }
-        return returnArr;
-      }
       function initJSON(isSealedJSON, newGuessPriceJSON, oddsJSON, teamObj) {
         let sealed = JSON.parse(isSealedJSON);
         let guessPrice = JSON.parse(newGuessPriceJSON);
         let odds = JSON.parse(oddsJSON);
-        console.log(sealed, guessPrice, odds);
         let returnArr = [];
         for (let key in odds) {
           returnArr.push({
@@ -212,22 +183,32 @@ export default {
       }
     },
     // 保存竞猜修改
-    saveGuessItem(item, isSealed) {
+    saveGuessItem(item,flag) {
       let params = {
         token: this.$store.state.user.token,
         guessInfoId: item.id,
-        guessPrice: item.guessPrice,
-        percentage: item.percentage,
-        playType: item.playType,
-        isSealed: isSealed
-      }
-      let ids = [], odds = [];
-      item.odds.forEach(ele => {
+       
+      };
+      let ids = [], odds = [], isSealed = [];
+      item.details.forEach(ele => {
         ids.push(ele.teamId);
-        odds.push(ele.value);
+        odds.push(ele.odd);
+        isSealed.push(ele.isSealed);
       });
       params.gameTeamIds = ids.join();
-      params.odds = odds.join();
+      if(flag != 'y'){
+         guessPric= item.guessPrice;
+        percentage=item.percentage;
+        playType=item.playTyp;
+        params.odds = odds.join();
+        params.isSealed = isSealed.join();
+        if(params.odds.includes('0')){
+          return this.$message({ showClose: true, message: "请填写正确赔率", type: "error" });
+        }
+      }else{
+        params.isSealed = 'all'
+      }
+      
       this.$http.post('guess/update', params).then(res => {
         if (res.retCode == 0) {
           this.$message({ showClose: true, message: "操作成功", type: "success" });
@@ -236,11 +217,11 @@ export default {
       })
     },
     // 锁定 / 解锁 
-    toggleLock(item, guess, isSealed) {
+    toggleLock(item, guess) {
       let params = {
         token: this.$store.state.user.token,
         guessInfoId: item.id,
-        isSealed: isSealed,
+        isSealed: 'y',
         gameTeamIds: guess.teamId
       }
       this.$http.post('guess/update', params).then(res => {
@@ -355,6 +336,10 @@ export default {
                 color: $defaultBule;
                 vertical-align: middle;
                 cursor: pointer;
+              }
+              .icon-suo{
+                color: $blue;
+                cursor: not-allowed;
               }
             }
             &:nth-child(2n) .item-l {
