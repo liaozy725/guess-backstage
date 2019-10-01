@@ -66,6 +66,7 @@
                   <el-button size="small" type="warning" @click="saveGuessItem(item,'n')" v-if="item.isSealed.includes('n')">保存</el-button>
                   <el-button size="small" type="danger" @click="saveGuessItem(item,'y')" v-if="item.isSealed.includes('n')">封盘</el-button>
                   <el-button size="small" type="primary" @click="jiesuan(item)" v-if="!item.isSealed.includes('n') && item.matchResult == 2">结算</el-button>
+                  <el-tag effect="plain" type="primary" v-if="!item.isSealed.includes('n') && item.matchResult == 1">已结算</el-tag>
                 </template>
               </el-table-column>
             </el-table>
@@ -78,7 +79,8 @@
                   <span>￥{{ele.price}}</span>
                 </div>
                 <div class="item-btns">
-                  <el-button size="small" v-if="!item.isSealed.includes('n')" type="success" round @click="updateGuessWin(item,ele)">胜利</el-button>
+                  <el-button size="small" v-if="!item.isSealed.includes('n') && !item.reamrk" type="success" round @click="updateGuessWin(item,ele)">胜利</el-button>
+                  <el-tag effect="plain" type="success" v-if="!item.isSealed.includes('n') && item.reamrk==ele.teamId">胜利</el-tag>
                   <i class="iconfont icon-jiesuo" v-if="ele.isSealed != 'y'" @click="toggleLock(item,ele,'y')"></i>
                   <i class="iconfont icon-suo" v-else></i>
                 </div>
@@ -177,8 +179,6 @@ export default {
             price: guessPrice[key]
           })
         }
-        console.log(returnArr);
-
         return returnArr;
       }
     },
@@ -268,16 +268,21 @@ export default {
     },
     // 结算
     jiesuan(item) {
-      let params = {
-        token: this.$store.state.user.token,
-        guessInfoId: item.id
-      }
-      this.$http.post('guess/jiesuan', params).then(res => {
-        if (res.retCode == 0) {
-          this.getGuessInfo();
-          this.$message({ showClose: true, message: "操作成功", type: "success" });
+      this.$confirm("此操作将结算此竞猜, 是否继续?", "提示").then(() => {
+        let params = {
+          token: this.$store.state.user.token,
+          guessInfoId: item.id
         }
+        this.$http.post('guess/jiesuan', params).then(res => {
+          if (res.retCode == 0) {
+            this.getGuessInfo();
+            this.$message({ showClose: true, message: "操作成功", type: "success" });
+          }
+        })
+      }).catch(() => {
+
       })
+      
     }
   },
   watch: {
