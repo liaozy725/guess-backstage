@@ -160,8 +160,6 @@ export default {
             ele.details = initJSON(ele.isSealed, ele.newGuessPrice, ele.odds, res.data.team)
           });
           this.guessInfo = res.data;
-          console.log(this.guessInfo);
-
         }
       })
       // 解析JSON数据，并做处理
@@ -197,9 +195,9 @@ export default {
       });
       params.gameTeamIds = ids.join();
       if(flag != 'y'){
-         guessPric= item.guessPrice;
-        percentage=item.percentage;
-        playType=item.playTyp;
+        params.guessPrice= item.guessPrice;
+        params.percentage=item.percentage;
+        params.playType=item.playTyp;
         params.odds = odds.join();
         params.isSealed = isSealed.join();
         if(params.odds.includes('0')){
