@@ -1,7 +1,7 @@
 // 战队管理
 <template>
   <div class="recharge">
-    <div class="search clearfix">
+    <!-- <div class="search clearfix">
       <el-row :gutter="10">
         <el-col :xs="24" :sm="24" :md="24" :lg="8" :xl="6">
           <div class="item">
@@ -13,7 +13,7 @@
       <div class="oneTerm">
         <div class="serchBtn pan-btn pink-btn" @click="selectList()">查询</div>
       </div>
-    </div>
+    </div> -->
 
     <el-card class="box-card">
       <el-table :data="tableData" style="width: 100%" stripe fit highlight-current-row v-loading="tableLoding">

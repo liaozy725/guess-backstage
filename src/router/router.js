@@ -45,8 +45,8 @@ var router = new Router({
       name: '竞猜管理',
       children: [
         {path: 'AllGuess',component: _import('GuessManage/AllGuess'),meta: {keepAlive: true},name: '全部竞猜'},
-        {path: 'DoingGuess',component: _import('GuessManage/DoingGuess'),meta: {keepAlive: true},name: '进行中'},
-        {path: 'EndGuess',component: _import('GuessManage/EndGuess'),meta: {keepAlive: true},name: '已结束'}
+        {path: 'DoingGuess',component: _import('GuessManage/DoingGuess'),meta: {keepAlive: true},name: '进行中',hidden:true},
+        {path: 'EndGuess',component: _import('GuessManage/EndGuess'),meta: {keepAlive: true},name: '已结束',hidden:true}
       ]
     }, 
     {
@@ -77,7 +77,7 @@ var router = new Router({
       name: '财务管理',
       children: [
         {path: 'Survey',component: _import('FinanceManage/Survey'),meta: {keepAlive: true},name: '概况'},
-        {path: 'Recharge',component: _import('FinanceManage/Recharge'),meta: {keepAlive: true},name: '充值'},
+        {path: 'Recharge',component: _import('FinanceManage/Recharge'),meta: {keepAlive: true},name: '充值',hidden:true},
         {path: 'ToCash',component: _import('FinanceManage/ToCash'),meta: {keepAlive: true},name: '提现审核'}
       ]
     },

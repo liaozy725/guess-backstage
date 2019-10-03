@@ -3,16 +3,16 @@
   <div class="recharge">
     <game-tabs :closable="false" :addable="false" @tabChange="tabChange"></game-tabs>
     <div class="search clearfix">
-      <el-row :gutter="10">
+      <!-- <el-row :gutter="10">
         <el-col :xs="24" :sm="24" :md="24" :lg="8" :xl="6">
           <div class="item">
             <span class="tit">手机号</span>
             <el-input clearable v-model="mobile" placeholder="请输入手机号" @keyup.enter.native="selectList()"></el-input>
           </div>
         </el-col>
-      </el-row>
+      </el-row> -->
       <div class="oneTerm">
-        <div class="serchBtn  pan-btn pink-btn" @click="selectList()">查询</div>
+        <!-- <div class="serchBtn  pan-btn pink-btn" @click="selectList()">查询</div> -->
         <div class="serchBtn  pan-btn green-btn" @click="addGuessVisible=true;guessId='';">添加竞猜</div>
       </div>
     </div>
@@ -165,5 +165,8 @@ export default {
 <style lang="scss" scoped>
 .el-tag {
   margin: 2px 4px 2px 0;
+}
+.search{
+  min-height:auto;
 }
 </style>

@@ -143,7 +143,7 @@ export default {
     },
     handleTabClick(e) {
       this.activeTab = e.name;
-      this.getGuessInfo(this.activeTab);
+      this.getGuessInfo();
       this.$refs['guessList'].scrollTop = 0;
     },
     // 获取竞猜详情

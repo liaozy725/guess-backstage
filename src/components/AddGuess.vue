@@ -27,6 +27,9 @@
         <el-form-item prop="matchTime" label="比赛时间">
           <el-date-picker v-model="formData.matchTime" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择比赛时间"></el-date-picker>
         </el-form-item>
+        <el-form-item prop="url" label="直播地址">
+          <el-input placeholder="请输入直播地址" v-model="formData.url"></el-input>
+        </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="beforeClose1">取 消</el-button>
@@ -58,7 +61,8 @@ export default {
         matchId: [{ required: true, message: '请选择赛事', trigger: 'change' }],
         name: [{ required: true, message: '请输入比赛名称', trigger: 'change' }],
         number: [{ required: true, message: '请输入比赛局数', trigger: 'change' }],
-        matchTime: [{ required: true, message: '请比赛时间', trigger: 'change' }],
+        matchTime: [{ required: true, message: '请选择比赛时间', trigger: 'change' }],
+        url: [{ required: true, message: '请输入直播地址', trigger: 'change' }],
       },
       formData: {
         gameId: '',
@@ -67,7 +71,8 @@ export default {
         number: '',
         matchTime: '',
         teamIds: '',
-        teamNames: ''
+        teamNames: '',
+        url:''
       },
       activeTab: 'first',
       matchList: [],// 竞猜内容列表
@@ -105,7 +110,8 @@ export default {
                 number: '',
                 matchTime: '',
                 teamIds: '',
-                teamNames: ''
+                teamNames: '',
+                url: ''
               };
               this.$emit("handleConfirm");
             }
