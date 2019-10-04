@@ -31,6 +31,7 @@ export default {
     bottom: 0;
     z-index: 1000;
     width: 200px;
+    overflow-x: hidden;
   }
   .main-container {
     min-height: 100%;
