@@ -49,7 +49,7 @@
                 </template>
               </el-table-column>
               <el-table-column prop="guessType" label="类型" header-align="center" align="center"></el-table-column>
-              <el-table-column prop="guessPrice" label="初始资金池" header-align="center" align="center"></el-table-column>
+              <el-table-column prop="guessPrice" label="资金池" header-align="center" align="center"></el-table-column>
               <el-table-column prop="bonusPrice" label="总奖金池" header-align="center" align="center"></el-table-column>
               <el-table-column prop="percentage" label="抽成" header-align="center" align="center"></el-table-column>
               <el-table-column prop="headImage" label="玩法" header-align="center" align="center">
