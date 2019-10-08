@@ -49,7 +49,11 @@
                 </template>
               </el-table-column>
               <el-table-column prop="guessType" label="类型" header-align="center" align="center"></el-table-column>
-              <el-table-column prop="guessPrice" label="资金池" header-align="center" align="center"></el-table-column>
+              <el-table-column prop="guessPrice" label="资金池" header-align="center" align="center">
+                <template slot-scope="scope">
+                  <el-input v-model="scope.row.guessPrice" type="number" placeholder="奖金池"></el-input>
+                </template>
+              </el-table-column>
               <el-table-column prop="bonusPrice" label="总奖金池" header-align="center" align="center"></el-table-column>
               <el-table-column prop="percentage" label="抽成" header-align="center" align="center"></el-table-column>
               <el-table-column prop="headImage" label="玩法" header-align="center" align="center">
@@ -72,7 +76,8 @@
             </el-table>
             <el-row :gutter="20" class="card-item-list">
               <el-col v-for="(ele,idx) in item.details" :xs="12" :sm="12" :md="12" :lg="12" :xl="12">
-                <span class="item-l">{{ele.teamName}}</span>
+                <!-- <span class="item-l">{{ele.teamName}}</span> -->
+                <el-input type="text" class="item-l" v-model="ele.teamName"></el-input>
                 <div class="item-r">
                   <label>赔率：</label>
                   <el-input v-model="ele.odd" :disabled="item.isSealed=='y'" type="number" clearable placeholder="赔率"></el-input>
@@ -81,8 +86,10 @@
                 <div class="item-btns">
                   <el-button size="small" v-if="!item.isSealed.includes('n') && !item.reamrk" type="success" round @click="updateGuessWin(item,ele)">胜利</el-button>
                   <el-tag effect="plain" type="success" v-if="!item.isSealed.includes('n') && item.reamrk==ele.teamId">胜利</el-tag>
-                  <i class="iconfont icon-jiesuo" v-if="ele.isSealed != 'y'" @click="toggleLock(item,ele,'y')"></i>
-                  <i class="iconfont icon-suo" v-else></i>
+                  <el-tooltip content="点击锁定" v-if="ele.isSealed != 'y'" placement="top">
+                    <i class="iconfont icon-suo" @click="toggleLock(item,ele,'y')"></i>
+                  </el-tooltip>
+                  <i class="iconfont icon-jiesuo" v-else></i>
                 </div>
               </el-col>
             </el-row>
@@ -157,26 +164,38 @@ export default {
         if (res.retCode == 0) {
           res.data.team = JSON.parse(res.data.team)
           res.data.guessInfoReps.forEach(ele => {
-            ele.details = initJSON(ele.isSealed, ele.newGuessPrice, ele.odds, res.data.team)
+            // debugger
+            ele.details = initJSON(ele.isSealed, ele.newGuessPrice, ele.odds, ele.teamInfo)
           });
           this.guessInfo = res.data;
         }
       })
       // 解析JSON数据，并做处理
-      function initJSON(isSealedJSON, newGuessPriceJSON, oddsJSON, teamObj) {
+      function initJSON(isSealedJSON, newGuessPriceJSON, oddsJSON, teamArr) {
         let sealed = JSON.parse(isSealedJSON);
         let guessPrice = JSON.parse(newGuessPriceJSON);
         let odds = JSON.parse(oddsJSON);
+        let teams = JSON.parse(teamArr)
         let returnArr = [];
-        for (let key in odds) {
+        for (let i = 0; i < teams.length; i++) {
+          let key = teams[i].teamId
           returnArr.push({
             teamId: key,
-            teamName: teamObj[key],
+            teamName: teams[i].teamName,
             odd: odds[key],
             isSealed: sealed[key],
             price: guessPrice[key]
           })
         }
+        // for (let key in teamArr) {
+        //   returnArr.push({
+        //     teamId: key,
+        //     teamName: teamObj[key],
+        //     odd: odds[key],
+        //     isSealed: sealed[key],
+        //     price: guessPrice[key]
+        //   })
+        // }
         return returnArr;
       }
     },
@@ -187,11 +206,12 @@ export default {
         guessInfoId: item.id,
        
       };
-      let ids = [], odds = [], isSealed = [];
+      let ids = [], odds = [], isSealed = [],gameTeamNames = [];
       item.details.forEach(ele => {
         ids.push(ele.teamId);
         odds.push(ele.odd);
         isSealed.push(ele.isSealed);
+        gameTeamNames.push(ele.teamName);
       });
       params.gameTeamIds = ids.join();
       if(flag != 'y'){
@@ -200,13 +220,13 @@ export default {
         params.playType=item.playTyp;
         params.odds = odds.join();
         params.isSealed = isSealed.join();
+        params.gameTeamNames = gameTeamNames.join();
         if(params.odds.includes('0')){
           return this.$message({ showClose: true, message: "请填写正确赔率", type: "error" });
         }
       }else{
         params.isSealed = 'all'
       }
-      
       this.$http.post('guess/update', params).then(res => {
         if (res.retCode == 0) {
           this.$message({ showClose: true, message: "操作成功", type: "success" });
@@ -312,22 +332,22 @@ export default {
             padding-right: 0 !important;
             border-top: 1px solid #999;
             .item-l {
-              flex: 0 0 90px;
+              flex: 0 0 120px;
               height: 40px;
               vertical-align: middle;
               line-height: 40px;
               display: inline-block;
-              padding-left: 10px;
+              padding:0 10px 0 5px;
             }
             .item-r {
               flex: 1;
               .el-input {
-                width: 90px;
+                width: 80px;
               }
               span {
                 font-size: 14px;
                 display: inline-block;
-                width: 190px;
+                width: 150px;
                 text-align: center;
               }
             }
@@ -340,7 +360,7 @@ export default {
                 vertical-align: middle;
                 cursor: pointer;
               }
-              .icon-suo{
+              .icon-jiesuo{
                 color: $blue;
                 cursor: not-allowed;
               }
