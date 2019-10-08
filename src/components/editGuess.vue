@@ -45,7 +45,7 @@
               <el-table-column prop="title" label="标题" header-align="center" align="center">
                 <template slot-scope="scope">
                   <span>{{scope.row.title}}</span>
-                  <span v-if="activeTab=='all'"> (第{{scope.row.number}}局)</span>
+                  <span v-if="activeTab=='all' && scope.row.number > 0"> (第{{scope.row.number}}局)</span>
                 </template>
               </el-table-column>
               <el-table-column prop="guessType" label="类型" header-align="center" align="center"></el-table-column>
