@@ -89,7 +89,8 @@
                   <el-tooltip content="点击锁定" v-if="ele.isSealed != 'y'" placement="top">
                     <i class="iconfont icon-suo" @click="toggleLock(item,ele,'y')"></i>
                   </el-tooltip>
-                  <i class="iconfont icon-jiesuo" v-else></i>
+                  <!-- <i class="iconfont icon-jiesuo" v-else></i> -->
+                  <el-button v-else type='text' class="yisuoding">已锁定</el-button>
                 </div>
               </el-col>
             </el-row>
@@ -360,7 +361,7 @@ export default {
                 vertical-align: middle;
                 cursor: pointer;
               }
-              .icon-jiesuo{
+              .yisuoding{
                 color: $blue;
                 cursor: not-allowed;
               }

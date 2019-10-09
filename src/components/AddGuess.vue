@@ -61,8 +61,7 @@ export default {
         matchId: [{ required: true, message: '请选择赛事', trigger: 'change' }],
         name: [{ required: true, message: '请输入比赛名称', trigger: 'change' }],
         number: [{ required: true, message: '请输入比赛局数', trigger: 'change' }],
-        matchTime: [{ required: true, message: '请选择比赛时间', trigger: 'change' }],
-        url: [{ required: true, message: '请输入直播地址', trigger: 'change' }],
+        matchTime: [{ required: true, message: '请选择比赛时间', trigger: 'change' }]
       },
       formData: {
         gameId: '',
