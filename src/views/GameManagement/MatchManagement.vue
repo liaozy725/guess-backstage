@@ -40,7 +40,7 @@
         <el-table-column label="操作" header-align="center" width="160" align="center">
           <template slot-scope="scope">
             <el-button type="text" size="small" @click="editMatch(scope.row)">编辑</el-button>
-            <el-button type="text" size="small">删除</el-button>
+            <el-button type="text" size="small" @click="deleteItem(scope.row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -194,6 +194,21 @@ export default {
       }
       this.visible=true;
       if(this.$refs['formRef'])this.$refs['formRef'].resetFields();
+    },
+    // 删除
+    deleteItem(item){
+      this.$confirm('此操作将永久删除该赛事, 是否继续?', '提示').then(() => {
+        let params = {
+          id: item.id,
+          token: this.$store.getters.token
+        };
+        this.$http.post("match/matchDel", params).then(res => {
+          if (res.retCode == 0) {
+            this.$message({ showClose: true, message: "操作成功", type: "success" });
+            this.getList();
+          }
+        });
+      }).catch(() => { })
     }
   }
 }
