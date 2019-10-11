@@ -86,9 +86,10 @@ var router = new Router({
       component: Layout,
       redirect: '/jc/SystemMessage/SystemMessage',
       icon: 'icon-xitongxiaoxi',
-      name: '系统消息',
+      name: '系统设置',
       children: [
-        {path: 'SystemMessage',component: _import('SystemMessage/SystemMessage'),meta: {keepAlive: true},name: '系统消息'}
+        {path: 'SystemConfig',component: _import('SystemMessage/SystemConfig'),meta: {keepAlive: true},name: '分销设置'},
+        {path: 'SystemMessage',component: _import('SystemMessage/SystemMessage'),meta: {keepAlive: true},name: '系统消息'},
       ]
     }
   ]
