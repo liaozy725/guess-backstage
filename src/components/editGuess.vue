@@ -49,12 +49,12 @@
                 </template>
               </el-table-column>
               <el-table-column prop="guessType" label="类型" header-align="center" align="center"></el-table-column>
-              <el-table-column prop="guessPrice" label="资金池" header-align="center" align="center">
+              <el-table-column prop="guessPrice" label="奖金池" header-align="center" align="center">
                 <template slot-scope="scope">
-                  <el-input v-model="scope.row.guessPrice" type="number" placeholder="奖金池"></el-input>
+                  <el-input v-model="scope.row.guessPrice" type="number" clearable placeholder="奖金池"></el-input>
                 </template>
               </el-table-column>
-              <el-table-column prop="bonusPrice" label="总奖金池" header-align="center" align="center"></el-table-column>
+              <el-table-column prop="bonusPrice" label="资金池" header-align="center" align="center"></el-table-column>
               <el-table-column prop="percentage" label="抽成" header-align="center" align="center"></el-table-column>
               <el-table-column prop="headImage" label="玩法" header-align="center" align="center">
                 <template slot-scope="scope">
@@ -77,7 +77,7 @@
             <el-row :gutter="20" class="card-item-list">
               <el-col v-for="(ele,idx) in item.details" :xs="12" :sm="12" :md="12" :lg="12" :xl="12">
                 <!-- <span class="item-l">{{ele.teamName}}</span> -->
-                <el-input type="text" class="item-l" v-model="ele.teamName"></el-input>
+                <el-input type="text" class="item-l" clearable placeholder="竞猜选项" v-model="ele.teamName"></el-input>
                 <div class="item-r">
                   <label>赔率：</label>
                   <el-input v-model="ele.odd" :disabled="item.isSealed=='y'" type="number" clearable placeholder="赔率"></el-input>
@@ -89,8 +89,7 @@
                   <el-tooltip content="点击锁定" v-if="ele.isSealed != 'y'" placement="top">
                     <i class="iconfont icon-suo" @click="toggleLock(item,ele,'y')"></i>
                   </el-tooltip>
-                  <!-- <i class="iconfont icon-jiesuo" v-else></i> -->
-                  <el-button v-else type='text' class="yisuoding">已锁定</el-button>
+                  <el-button v-if="ele.isSealed != 'y' && item.matchResult != 2" type='text' class="yisuoding">已锁定</el-button>
                 </div>
               </el-col>
             </el-row>
