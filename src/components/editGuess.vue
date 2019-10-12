@@ -136,7 +136,6 @@ export default {
         teamNames: ''
       },
       activeTab: 'all', // 获取第几局数据
-      tableData: [1],
       guessInfo: {}
     }
   },
