@@ -186,15 +186,6 @@ export default {
             price: guessPrice[key]
           })
         }
-        // for (let key in teamArr) {
-        //   returnArr.push({
-        //     teamId: key,
-        //     teamName: teamObj[key],
-        //     odd: odds[key],
-        //     isSealed: sealed[key],
-        //     price: guessPrice[key]
-        //   })
-        // }
         return returnArr;
       }
     },
@@ -213,6 +204,9 @@ export default {
         gameTeamNames.push(ele.teamName);
       });
       params.gameTeamIds = ids.join();
+      if(item.guessPrice<=0){
+        return this.$message({ showClose: true, message: "奖金池必须大于零", type: "error" }); 
+      }
       if(flag != 'y'){
         params.guessPrice= item.guessPrice;
         params.percentage=item.percentage;
