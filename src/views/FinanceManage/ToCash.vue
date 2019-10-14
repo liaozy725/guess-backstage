@@ -113,13 +113,16 @@ export default {
         message: '是否同意该条提现申请？',
         type: 'warning',
         showCancelButton: true,
+        distinguishCancelAndClose:true,
         cancelButtonText: '拒绝',
         confirmButtonText: '同意'
       }).then(() => {
         this.submitAudit(row.id, 'agree')
-      }).catch(() => [
-        this.submitAudit(row.id, 'refuse')
-      ])
+      }).catch((action) => {
+        if(action == 'cancel'){
+          this.submitAudit(row.id, 'refuse')
+        }
+      })
     },
     submitAudit(id, withdrawState) {
       let params = {
