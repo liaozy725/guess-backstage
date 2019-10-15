@@ -44,7 +44,7 @@
         </el-table-column>
         <el-table-column label="操作" header-align="center" width="100" align="center">
           <template slot-scope="scope">
-            <!-- <el-button type="text" size="small" @click="deleteItem(scope.row)">删除</el-button> -->
+            <el-button v-if="scope.row.orderType == 'success'" type="text" size="small" @click="invalidOrder(scope.row)">撤销</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -113,6 +113,21 @@ export default {
           this.total = parseInt(res.pageCount);
         }
       });
+    },
+    // 订单撤销
+    invalidOrder(item){
+      this.$confirm('此操作将撤销该订单, 是否继续?', '提示').then(() => {
+        let params = {
+          orderNo: item.orderNo,
+          token: this.$store.getters.token
+        };
+        this.$http.post("order/invalidOrder", params).then(res => {
+          if (res.retCode == 0) {
+            this.$message({ showClose: true, message: "操作成功", type: "success" });
+            this.getList();
+          }
+        });
+      }).catch(() => { })
     }
   }
 };

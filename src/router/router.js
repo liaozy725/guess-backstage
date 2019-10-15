@@ -59,16 +59,16 @@ var router = new Router({
         {path: 'UserList',component: _import('UserManage/UserList'),meta: {keepAlive: true},name: '用户列表'}
       ]
     },
-    {
-      path: '/jc/orderManage',
-      component: Layout,
-      redirect: '/orderManage/orderList',
-      icon: 'icon-menu-ddgl-normal',
-      name: '订单管理',
-      children: [
-        {path: 'orderList',component: _import('orderManage/orderList'),meta: {keepAlive: true},name: '订单列表'}
-      ]
-    },
+    // {
+    //   path: '/jc/orderManage',
+    //   component: Layout,
+    //   redirect: '/orderManage/orderList',
+    //   icon: 'icon-menu-ddgl-normal',
+    //   name: '订单管理',
+    //   children: [
+    //     {path: 'orderList',component: _import('orderManage/orderList'),meta: {keepAlive: true},name: '订单列表'}
+    //   ]
+    // },
     {
       path: '/jc/FinanceManage',
       component: Layout,
@@ -78,7 +78,8 @@ var router = new Router({
       children: [
         {path: 'Survey',component: _import('FinanceManage/Survey'),meta: {keepAlive: true},name: '概况'},
         {path: 'Recharge',component: _import('FinanceManage/Recharge'),meta: {keepAlive: true},name: '充值',hidden:true},
-        {path: 'ToCash',component: _import('FinanceManage/ToCash'),meta: {keepAlive: true},name: '提现审核'}
+        {path: 'OrderList',component: _import('FinanceManage/OrderList'),meta: {keepAlive: true},name: '充值订单'},
+        {path: 'ToCash',component: _import('FinanceManage/ToCash'),meta: {keepAlive: true},name: '提现审核'},
       ]
     },
     {
