@@ -22,7 +22,8 @@
         <el-table-column type="index" :index="indexMethod" width="90" label="序号" header-align="center" align="center"></el-table-column>
         <el-table-column prop="teamPic" label="战队LOGO" header-align="center" align="center">
           <template slot-scope="scope">
-            <img width="60" height="60" :src="scope.row.teamPic">
+            <!-- <img width="60" height="60" :src="scope.row.teamPic"> -->
+            <el-image :src="scope.row.teamPic" style="width:80px;height:80px;" :preview-src-list='[scope.row.teamPic]'></el-image>
           </template>
         </el-table-column>
         <el-table-column prop="teamName" label="战队名称" header-align="center" align="center"></el-table-column>
