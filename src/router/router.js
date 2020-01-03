@@ -1,7 +1,7 @@
-import Vue from "vue";
-import Router from "vue-router";
+import Vue from 'vue';
+import Router from 'vue-router';
 const _import = require('./_import_' + process.env.NODE_ENV)
-import Layout from "@/views/layout/Layout.vue";
+import Layout from '@/views/layout/Layout.vue';
 
 import NProgress from 'nprogress' // Progress 进度条
 import 'nprogress/nprogress.css' // Progress 进度条样式
@@ -56,7 +56,8 @@ var router = new Router({
       icon: 'icon-yonghu',
       name: '用户管理',
       children: [
-        {path: 'UserList',component: _import('UserManage/UserList'),meta: {keepAlive: true},name: '用户列表'}
+        {path: 'UserList',component: _import('UserManage/UserList'),meta: {keepAlive: true},name: '用户列表'},
+        {path: 'agentConfig',component: _import('UserManage/agentConfig'),meta: {keepAlive: true},name: '代理管理'},
       ]
     },
     // {
@@ -91,7 +92,7 @@ var router = new Router({
       children: [
         {path: 'SystemConfig',component: _import('SystemMessage/SystemConfig'),meta: {keepAlive: true},name: '分销设置'},
         {path: 'SystemMessage',component: _import('SystemMessage/SystemMessage'),meta: {keepAlive: true},name: '系统消息'},
-        {path: 'bannerConfig',component: _import('SystemMessage/bannerConfig'),meta: {keepAlive: true},name: '广告管理'},
+        {path: 'bannerConfig',component: _import('SystemMessage/bannerConfig'),meta: {keepAlive: true},name: '广告管理'}
       ]
     }
   ]

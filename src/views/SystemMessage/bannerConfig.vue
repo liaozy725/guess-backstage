@@ -16,16 +16,16 @@
             <el-image style="width:100px;height:100px;" :src="scope.row.pic" :preview-src-list='[scope.row.pic]'></el-image>
           </template>
         </el-table-column>
-        <el-table-column prop="updateTime" label="创建时间" header-align="center" align="center">
+        <!-- <el-table-column prop="updateTime" label="创建时间" header-align="center" align="center">
           <template slot-scope="scope">
             <span>{{scope.row.createTime | parseTime}}</span>
           </template>
-        </el-table-column>
-        <el-table-column prop="state" label="状态" header-align="center" align="center">
+        </el-table-column> -->
+        <!-- <el-table-column prop="state" label="状态" header-align="center" align="center">
           <template slot-scope="scope">
             <span>{{stateObj[scope.row.state]}}</span>
           </template>
-        </el-table-column>
+        </el-table-column> -->
         <el-table-column label="操作" header-align="center" width="160" align="center">
           <template slot-scope="scope">
             <el-button type="text" size="small" @click="deleteItem(scope.row)">删除</el-button>
