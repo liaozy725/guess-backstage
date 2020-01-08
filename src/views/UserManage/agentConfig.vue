@@ -17,6 +17,7 @@
         <el-table-column prop="userFrozenBalance" label="冻结余额" header-align="center" align="center"></el-table-column>
         <el-table-column prop="userPrize" label="奖金" header-align="center" align="center"></el-table-column>
         <el-table-column prop="userFrozenPrize" label="冻结奖金" header-align="center" align="center"></el-table-column>
+        <el-table-column prop="prestore" label="费率" header-align="center" align="center"></el-table-column>
         <el-table-column prop="updateTime" label="创建时间" header-align="center" align="center">
           <template slot-scope="scope">
             <span>{{scope.row.updateTime | parseTime}}</span>
