@@ -36,8 +36,8 @@
         <el-table-column prop="state" label="状态" header-align="center" align="center"></el-table-column>
         <el-table-column label="操作" header-align="center" width="160" align="center">
           <template slot-scope="scope">
-            <!-- <el-button type="text" size="small" @click="editGuess1(scope.row)">编辑竞猜</el-button> -->
             <el-button type="text" size="small" @click="getDetail(scope.row,false)">详情</el-button>
+            <el-button type="text" size="small" @click="deleteGuess(scope.row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -153,10 +153,28 @@ export default {
       this.guessId = item.id;
       this.editGuessVisible = true;
     },
-    // 编辑竞猜第一步
-    editGuess1(item){
-      // this.guessId = item.id;
-      this.addGuessVisible = true;
+    // 删除竞猜
+    deleteGuess(item){
+      this.$confirm('此操作将永久删除该竞猜数据, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(()=>{
+        let params = {
+          guessId: item.id,
+          token: this.$store.state.user.token
+        }
+        this.$http.post('guess/delGuess',params).then(res=>{
+          if (res.retCode == 0) {
+            this.$message({
+              showClose: true,
+              message: "操作成功",
+              type: "success"
+            });
+            this.getList();
+          }
+        })
+      }).catch(()=>{})
     }
   }
 }

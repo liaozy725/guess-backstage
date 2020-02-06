@@ -11,6 +11,7 @@
 </template>
 
 <script>
+import { log } from 'util';
 // import OSS from 'ali-oss'
 export default {
   props: {
@@ -120,7 +121,11 @@ export default {
         this.uploading = false;
         file.onSuccess(rst.res);
       }).catch(err=>{
-
+        file.onError()
+        this.$message({
+          message: "图片上传失败",
+          type: 'error'
+        });
       })
     },
     // 上传完成回调

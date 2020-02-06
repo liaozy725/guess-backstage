@@ -1,11 +1,30 @@
 <template>
   <div class="game-tabs">
-    <el-tabs :addable="addable" :closable="closable" tab-position="top" v-model="selectedTabs" @tab-click="tabClick" @tab-remove="tabRemove" @tab-add="tabAdd">
-      <el-tab-pane v-for="item in tabList" :label="item.gameName" :name="item.id+''"></el-tab-pane>
-    </el-tabs>
+    <div class="tabs-box">
+      <el-tabs
+        :closable="closable"
+        tab-position="top"
+        v-model="selectedTabs"
+        @tab-click="tabClick"
+        @tab-remove="tabRemove"
+        @tab-add="tabAdd"
+      >
+        <el-tab-pane v-for="item in tabList" :label="item.gameName" :name="item.id+''"></el-tab-pane>
+      </el-tabs>
+      <div class="tabs-btns">
+        <el-button size='small' type="success" @click="editTab"><i class="el-icon-edit"></i></el-button>
+        <el-button @click="tabAdd" size='small' type="primary"><i class="el-icon-plus"></i></el-button>
+      </div>
+    </div>
 
-    <el-dialog :visible.sync="visible" title="添加游戏" center top="10vh" :close-on-click-modal="false">
-      <el-form :model="formData" :rules="callRules" ref="addGameForm" label-width="90px" class="demo-dynamic">
+    <el-dialog :visible.sync="visible" :title="formData.id?'编辑游戏':'添加游戏'" center top="10vh" :close-on-click-modal="false">
+      <el-form
+        :model="formData"
+        :rules="callRules"
+        ref="addGameForm"
+        label-width="90px"
+        class="demo-dynamic"
+      >
         <el-form-item prop="gameName" label="游戏名称">
           <el-input placeholder="请输入游戏名称" v-model="formData.gameName"></el-input>
         </el-form-item>
@@ -16,7 +35,15 @@
           <el-input placeholder="请输入游戏名称" type="number" v-model="formData.peopleNum"></el-input>
         </el-form-item>
         <el-form-item prop="gamePic" label="游戏图标">
-          <upload accept="image/*" listType="picture-card" :limit="1" :multiple="false" @uploadSuccess="uploadSuccess" @uploadRemove="uploadRemove"></upload>
+          <upload
+            accept="image/*"
+            listType="picture-card"
+            :limit="1"
+            :multiple="false"
+            :fileListData="fileListData"
+            @uploadSuccess="uploadSuccess"
+            @uploadRemove="uploadRemove"
+          ></upload>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -28,7 +55,7 @@
 </template>
 
 <script>
-import Upload from '@/components/Upload.vue';
+import Upload from "@/components/Upload.vue";
 export default {
   props: {
     addable: {
@@ -46,13 +73,13 @@ export default {
       tabList: this.$store.state.user.gameList || [],
       visible: false,
       btnLoading: false,
+      showMenu: false,
+      fileListData:[],
       callRules: {
         gameName: [
           { required: true, message: "请输入战队名称", trigger: "blur" }
         ],
-        number: [
-          { required: true, message: "请输入战队数", trigger: "blur" }
-        ],
+        number: [{ required: true, message: "请输入战队数", trigger: "blur" }],
         peopleNum: [
           { required: true, message: "请输入单场人数", trigger: "blur" }
         ]
@@ -61,16 +88,25 @@ export default {
         gameName: "",
         number: "",
         peopleNum: "",
-        gamePic:''
+        gamePic: ""
+      },
+      position: {
+        top: 0,
+        left: 0
       }
     };
   },
   components: { Upload },
   created() {
-    if (!this.$store.state.user.gameList || this.$store.state.user.gameList.length <= 0) {
+    if (
+      !this.$store.state.user.gameList ||
+      this.$store.state.user.gameList.length <= 0
+    ) {
       this.getGameList();
     } else {
-      this.selectedTabs = this.$store.state.app.activeGameTab || this.$store.state.user.gameList[0].id + '';
+      this.selectedTabs =
+        this.$store.state.app.activeGameTab ||
+        this.$store.state.user.gameList[0].id + "";
       this.$emit("tabChange", this.selectedTabs);
     }
   },
@@ -78,7 +114,7 @@ export default {
     // 点击
     tabClick(e) {
       this.$emit("tabChange", e.name);
-      this.$store.commit('setActiveGameTab', e.name)
+      this.$store.commit("setActiveGameTab", e.name);
     },
     // 删除游戏
     tabRemove(name) {
@@ -86,36 +122,61 @@ export default {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
-      }).then(() => {
-        let params = {
-          token: this.$store.state.user.token,
-          id: name
-        }
-        this.$http.post('game/delGame', params).then(res => {
-          if (res.retCode == 0) {
-            this.getGameList();
-          }
+      })
+        .then(() => {
+          let params = {
+            token: this.$store.state.user.token,
+            id: name
+          };
+          this.$http.post("game/delGame", params).then(res => {
+            if (res.retCode == 0) {
+              this.getGameList();
+            }
+          });
         })
-      }).catch(() => { });
+        .catch(() => {});
     },
     // 添加游戏
     tabAdd(e) {
+      this.formData= {
+        gameName: "",
+        number: "",
+        peopleNum: "",
+        gamePic: ""
+      }
+      this.fileListData =[];
       this.visible = true;
+    },
+    // 编辑游戏
+    editTab(){
+      let index = this.tabList.findIndex((item)=>{
+        return item.id == this.selectedTabs
+      })
+      this.formData = JSON.parse(JSON.stringify(this.tabList[index]));
+      this.fileListData = [{name:'',url:this.formData.gamePic}];
+      this.visible = true
     },
     // 确定新建游戏
     confirmAddTabs() {
-      this.$refs['addGameForm'].validate(valid => {
+      this.$refs["addGameForm"].validate(valid => {
         if (valid) {
-          let params = Object.assign({token: this.$store.getters.token }, this.formData);
-          this.$http.post('game/operation', params).then(res => {
+          let params = Object.assign(
+            { token: this.$store.getters.token },
+            this.formData
+          );
+          this.$http.post("game/operation", params).then(res => {
             if (res.retCode == 0) {
               this.visible = false;
-              this.$message({ showClose: true, message: "操作成功", type: "success" });
+              this.$message({
+                showClose: true,
+                message: "操作成功",
+                type: "success"
+              });
               this.getGameList();
             }
-          })
+          });
         }
-      })
+      });
     },
     // 获取游戏列表
     getGameList() {
@@ -128,11 +189,11 @@ export default {
         if (res.retCode == 0) {
           this.tabList = res.data;
           if (res.data.length > 0) {
-            this.selectedTabs = res.data[0].id + '';
-            this.$store.commit('setActiveGameTab', this.selectedTabs)
+            this.selectedTabs = res.data[0].id + "";
+            this.$store.commit("setActiveGameTab", this.selectedTabs);
             this.$emit("tabChange", this.selectedTabs);
           }
-          this.$store.commit('setGameList', this.tabList);
+          this.$store.commit("setGameList", this.tabList);
         }
       });
     },
@@ -141,8 +202,8 @@ export default {
       this.formData.gamePic = res[0];
     },
     // 图片删除回调
-    uploadRemove(res){
-      this.formData.gamePic = '';
+    uploadRemove(res) {
+      this.formData.gamePic = "";
     }
   }
 };
@@ -162,6 +223,18 @@ export default {
     margin-bottom: 0;
     i {
       font-size: 28px;
+    }
+  }
+}
+.tabs-box{
+  display: flex;
+  .el-tabs{
+    flex: 1;
+  }
+  .tabs-btns{
+    width: 120px;
+    .el-button{
+      font-size: 14px;
     }
   }
 }
