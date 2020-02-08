@@ -6,7 +6,7 @@
           <div class="logo-left-img">
             <img src="../../assets/logo.png" alt />
           </div>
-          <div class="logoTitle">竞猜后台</div>
+          <div class="logoTitle">后台管理系统</div>
         </div>
       </div>
       <div class="login-right fr">
@@ -110,12 +110,12 @@ export default {
 
       .logo-left-text {
         margin: 173px auto 0;
-        width: 192px;
+        width: 300px;
 
         .logo-left-img img {
           display: block;
           margin: 0 auto;
-          width: 200px;
+          width: 300px;
         }
 
         .logoTitle {
