@@ -230,6 +230,7 @@ export default {
   display: flex;
   .el-tabs{
     flex: 1;
+    width: 70%;
   }
   .tabs-btns{
     width: 120px;

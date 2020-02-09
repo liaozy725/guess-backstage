@@ -6,7 +6,7 @@ module.exports = {
   devServer: {
     proxy: {
       '/apis': {
-        target: 'http://jingcaiadmin.manggeek.com/',
+        target: 'http://admin.jkgame.org/',
         changeOrigin: true,
         ws: true,
         pathRewrite: {
