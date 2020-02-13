@@ -48,7 +48,7 @@
       <pagination :pageNum="pageNum" :total="total" :pageSize="pageSize" v-on:handleSizeChange="handleSizeChange" v-on:handleCurrentChange="handleCurrentChange"></pagination>
     </el-card>
 
-    <el-dialog :visible.sync="visible" :title="formData.id?'编辑竞猜内容':'添加竞猜内容'" center top="10vh">
+    <el-dialog :visible.sync="visible" :title="formData.id?'编辑竞猜内容':'添加竞猜内容'" center top="10vh" :before-close="()=>{visible=false;}" :close-on-click-modal="false">
       <el-form :model="formData" :rules="callRules" ref="formRef" label-width="90px" class="demo-dynamic">
         <el-form-item prop="title" label="竞猜标题">
           <el-input placeholder="请输入竞猜标题" v-model="formData.title"></el-input>

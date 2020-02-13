@@ -94,6 +94,10 @@ var router = new Router({
         {path: 'SystemMessage',component: _import('SystemMessage/SystemMessage'),meta: {keepAlive: true},name: '系统消息'},
         {path: 'bannerConfig',component: _import('SystemMessage/bannerConfig'),meta: {keepAlive: true},name: '广告管理'}
       ]
+    },
+    {
+      path:'*',
+      redirect: '/jc/GameManagement/TeamManagement'
     }
   ]
 });
