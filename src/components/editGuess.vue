@@ -28,19 +28,19 @@
         <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" class="flex-item">
           <label class="tit">战队:</label>
           <span>
-            <el-tag class="team-tag" v-for="(value,key,index) in guessInfo.team">{{value}}</el-tag>
+            <el-tag class="team-tag" v-for="(value,key,index) in guessInfo.team" :key='index'>{{value}}</el-tag>
           </span>
         </el-col>
       </el-row>
       <el-card class="guess-list-container" shadow="never">
         <el-tabs v-model="activeTab" @tab-click="handleTabClick">
           <el-tab-pane label="总竞猜" name="all"></el-tab-pane>
-          <el-tab-pane v-for="tab in guessInfo.number" :label="'第'+tab+'局'" :name="tab+''"></el-tab-pane>
+          <el-tab-pane v-for="tab in guessInfo.number" :label="'第'+tab+'局'" :name="tab+''" :key='tab'></el-tab-pane>
         </el-tabs>
         <!-- 总竞猜 -->
         <div class="guess-list" ref="guessList" :style="{height:'50vh',overflow:'auto'}">
           <!-- 循环 这个 -->
-          <el-card class="list-box" v-for="item in guessInfo.guessInfoReps">
+          <el-card class="list-box" v-for="(item,index) in guessInfo.guessInfoReps" :key="index">
             <el-table :data="[item]">
               <el-table-column prop="title" label="标题" header-align="center" align="center">
                 <template slot-scope="scope">
@@ -75,7 +75,7 @@
               </el-table-column>
             </el-table>
             <el-row :gutter="20" class="card-item-list">
-              <el-col v-for="(ele,idx) in item.details" :xs="12" :sm="12" :md="12" :lg="12" :xl="12">
+              <el-col v-for="(ele,idx) in item.details" :xs="12" :sm="12" :md="12" :lg="12" :xl="12" :key="idx">
                 <!-- <span class="item-l">{{ele.teamName}}</span> -->
                 <el-input type="text" class="item-l" clearable placeholder="竞猜选项" v-model="ele.teamName"></el-input>
                 <div class="item-r">
@@ -90,6 +90,8 @@
                     <i class="iconfont icon-suo" @click="toggleLock(item,ele,'y')"></i>
                   </el-tooltip>
                   <el-button v-if="ele.isSealed != 'y' && item.matchResult != 2" type='text' class="yisuoding">已锁定</el-button>
+                  <el-button v-if="ele.isShow == 'y'" effect="plain" round type='warning' size="small" @click="toggleShow(item,ele)">隐藏</el-button>
+                  <el-tag effect="plain" type="warning" v-else>已隐藏</el-tag>
                 </div>
               </el-col>
             </el-row>
@@ -183,6 +185,7 @@ export default {
             teamName: teams[i].teamName,
             odd: odds[key],
             isSealed: sealed[key],
+            isShow: teams[i].isShow,
             price: guessPrice[key]
           })
         }
@@ -241,6 +244,22 @@ export default {
           this.getGuessInfo();
         }
       })
+    },
+    // 隐藏/显示
+    toggleShow(item,guess){
+      this.$confirm("此操作将隐藏此该数据, 是否继续?", "提示").then(() => {
+        let params = {
+          token: this.$store.state.user.token,
+          id: guess.teamId
+        };
+        this.$http.post('guess/updateIsShow',params).then(res =>{
+          if(res.retCode == 0){
+            this.$message({ showClose: true, message: "操作成功", type: "success" });
+            this.getGuessInfo();
+          }
+        })
+      })
+      
     },
     // 删除竞猜
     deleteGuessItem(item) {

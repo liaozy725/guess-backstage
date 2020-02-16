@@ -6,7 +6,7 @@
           <i v-if='item.icon' class="iconfont" :class="item.icon"></i><span>{{item.children[0].name}}</span>
         </el-menu-item>
       </router-link>
-      <el-submenu v-if="!item.noDropdown&&!item.hidden" :index="item.name">
+      <el-submenu v-if="!item.noDropdown&&!item.hidden" :index="item.name||''">
         <template slot="title">
           <i v-if='item.icon' class="iconfont" :class="item.icon"></i><span>{{item.name}}</span>
         </template>

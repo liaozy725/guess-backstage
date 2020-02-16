@@ -4,7 +4,7 @@
       <el-form :model="formData" :rules="callRules" ref="form1" label-width="90px" class="demo-dynamic">
         <el-form-item prop="gameId" label="游戏">
           <el-select v-model="formData.gameId" placeholder="请选择游戏" clearable style="width:100%;">
-            <el-option v-for="item in gameList" :label="item.gameName" :value="item.id"></el-option>
+            <el-option v-for="item in gameList" :label="item.gameName" :value="item.id" :key="item.id"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item prop="matchId" label="赛事">

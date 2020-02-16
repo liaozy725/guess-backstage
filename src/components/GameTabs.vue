@@ -9,7 +9,7 @@
         @tab-remove="tabRemove"
         @tab-add="tabAdd"
       >
-        <el-tab-pane v-for="item in tabList" :label="item.gameName" :name="item.id+''"></el-tab-pane>
+        <el-tab-pane v-for="item in tabList" :label="item.gameName" :name="item.id+''" :key='item.id'></el-tab-pane>
       </el-tabs>
       <div class="tabs-btns">
         <el-button size='small' type="success" @click="editTab"><i class="el-icon-edit"></i></el-button>

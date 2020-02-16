@@ -30,7 +30,7 @@
         </el-table-column>
         <el-table-column prop="team" label="战队" header-align="center" align="center">
           <template slot-scope="scope">
-            <el-tag class="team-tag" v-for="(value,key,index) in scope.row.team">{{value}}</el-tag>
+            <el-tag class="team-tag" v-for="(value,key,index) in scope.row.team" :key='index'>{{value}}</el-tag>
           </template>
         </el-table-column>
         <el-table-column prop="state" label="状态" header-align="center" align="center"></el-table-column>
